@@ -58,25 +58,25 @@ const InstagramHomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const stories: Story[] = [
-    { id: 1, username: 'luffy_strawhat', image: 'https://picsum.photos/seed/luffy/150/150' },
-    { id: 2, username: 'goku_saiyan', image: 'https://picsum.photos/seed/goku/150/150' },
-    { id: 3, username: 'naruto_hokage', image: 'https://picsum.photos/seed/naruto/150/150' },
-    { id: 4, username: 'zoro_swordsman', image: 'https://picsum.photos/seed/zoro/150/150' },
-    { id: 5, username: 'gojo_sensei', image: 'https://picsum.photos/seed/gojo/150/150' },
-    { id: 6, username: 'usopp_sniper', image: 'https://picsum.photos/seed/usopp/150/150' },
-    { id: 7, username: 'itachi_akatsuki', image: 'https://picsum.photos/seed/itachi/150/150' },
-    { id: 8, username: 'levi_clean', image: 'https://picsum.photos/seed/levi/150/150' },
+    { id: 1, username: 'luffy_strawhat', image: 'https://static.beebom.com/wp-content/uploads/2024/05/gear-5-featured-new.jpg?w=1024' },
+    { id: 2, username: 'goku_saiyan', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqwlsYgyc8FVLURPVae1wnOT0Z1wWMMGqyYw&s' },
+    { id: 3, username: 'naruto_hokage', image: 'https://static0.cbrimages.com/wordpress/wp-content/uploads/2023/11/naruto-byron.jpg' },
+    { id: 4, username: 'zoro_swordsman', image: 'https://static0.srcdn.com/wordpress/wp-content/uploads/2024/06/one-piece-zoro-king-of-hell.jpg?w=1600&h=900&fit=crop' },
+    { id: 5, username: 'gojo_sensei', image: 'https://upload.wikimedia.org/wikipedia/it/7/77/Satoru_Gojo.jpg' },
+    { id: 6, username: 'usopp_sniper', image: 'https://preview.redd.it/pub7t1q255z41.jpg?auto=webp&s=f712b2ae7be1dd771c177ba0737b8d8a7c38e58e' },
+    { id: 7, username: 'itachi_akatsuki', image: 'https://static0.gamerantimages.com/wordpress/wp-content/uploads/2023/04/naruto-1-2.jpg?q=50&fit=crop&w=825&dpr=1.5' },
+    { id: 8, username: 'levi_clean', image: 'https://practicaltyping.com/wp-content/uploads/2022/04/leviacker.jpg' },
   ];
 
   const posts: Post[] = [
     {
       id: 1,
-      username: 'ringmagazine',
-      userImage: 'https://picsum.photos/seed/ring1/40/40',
+      username: 'God Valley Propaganda',
+      userImage: 'https://static.beebom.com/wp-content/uploads/2025/07/Rocks-D.-Xebec-face-reveal-in-One-Piece.jpg?w=1024',
       verified: true,
-      image: 'https://picsum.photos/seed/post1/600/600',
+      image: 'https://i.redd.it/4cixgj095rxf1.jpeg',
       likes: 12543,
-      caption: 'DEVIN HANEY WINNING - Check out the latest boxing updates! 🥊',
+      caption: 'King ShiZ',
       timeAgo: '58m',
       comments: 234,
       isLiked: false,
@@ -84,7 +84,7 @@ const InstagramHomePage: React.FC = () => {
     },
     {
       id: 2,
-      username: 'photographer',
+      username: 'Touch Grass',
       userImage: 'https://picsum.photos/seed/user2/40/40',
       image: 'https://picsum.photos/seed/post2/600/600',
       likes: 8921,
