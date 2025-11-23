@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import MapController from '../components/MapController';
 import MapRefSetter from '../components/MapRefSetter';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag, FiShare2, FiUsers, FiUser, FiGlobe, FiX, FiAlertTriangle, FiChevronLeft } from 'react-icons/fi';
+import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag, FiShare2, FiUsers, FiUser, FiGlobe, FiX, FiAlertTriangle, FiChevronLeft, FiPackage, FiCheck } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -265,6 +265,9 @@ const MapPage: React.FC = () => {
   const [sharingMode, setSharingMode] = useState<'public' | 'close-friends' | 'individuals' | 'disabled'>('disabled');
   const [showSharingOptions, setShowSharingOptions] = useState<boolean>(false);
   const [showSOSConfirmation, setShowSOSConfirmation] = useState<boolean>(false);
+  const [showAidCategories, setShowAidCategories] = useState<boolean>(false);
+  const [showAidThankYou, setShowAidThankYou] = useState<boolean>(false);
+  const [selectedAidCategory, setSelectedAidCategory] = useState<string>('');
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
   
   const closeFriends = ['Monkey D. Luffy', 'Son Goku', 'Naruto Uzumaki', 'Roronoa Zoro', 'Satoru Gojo'];
@@ -1814,6 +1817,37 @@ const MapPage: React.FC = () => {
                 {selectedShelter.phone}
               </a>
             )}
+
+            {/* Provide Aid Button */}
+            <button
+              onClick={() => setShowAidCategories(true)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '12px',
+                padding: '12px',
+                backgroundColor: '#3b82f6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#2563eb';
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#3b82f6';
+              }}
+            >
+              <FiPackage size={16} />
+              Provide Aid
+            </button>
           </div>
         </div>
       )}
@@ -2234,6 +2268,211 @@ const MapPage: React.FC = () => {
             }}>
               Location: {selectedMemory.position[0].toFixed(4)}, {selectedMemory.position[1].toFixed(4)}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Aid Category Selection Modal */}
+      {showAidCategories && selectedShelter && (
+        <div
+          onClick={() => setShowAidCategories(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 3000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#1a1a1a',
+              borderRadius: '16px',
+              padding: '24px',
+              maxWidth: '400px',
+              width: '90%',
+              border: '1px solid #3b82f6',
+              cursor: 'default',
+              boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
+            }}>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#fff' }}>
+                Provide Aid to {selectedShelter.operator}
+              </h2>
+              <button
+                onClick={() => setShowAidCategories(false)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#262626';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <p style={{ margin: '0 0 20px 0', color: '#8e8e8e', fontSize: '14px', lineHeight: '1.5' }}>
+              Select the category of aid you would like to provide:
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {['Bedding', 'Food', 'Clothing', 'Medical Supplies', 'Hygiene Products', 'Water', 'Other'].map((category) => (
+                <button
+                  key={category}
+                  onClick={() => {
+                    setSelectedAidCategory(category);
+                    setShowAidCategories(false);
+                    setShowAidThankYou(true);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    backgroundColor: '#262626',
+                    color: '#fff',
+                    border: '1px solid #333',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}
+                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.currentTarget.style.backgroundColor = '#333';
+                    e.currentTarget.style.borderColor = '#3b82f6';
+                  }}
+                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.currentTarget.style.backgroundColor = '#262626';
+                    e.currentTarget.style.borderColor = '#333';
+                  }}
+                >
+                  <FiPackage size={18} color="#3b82f6" />
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Aid Thank You Modal */}
+      {showAidThankYou && selectedShelter && (
+        <div
+          onClick={() => {
+            setShowAidThankYou(false);
+            setSelectedAidCategory('');
+          }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 3000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#1a1a1a',
+              borderRadius: '16px',
+              padding: '32px',
+              maxWidth: '400px',
+              width: '90%',
+              border: '2px solid #22c55e',
+              cursor: 'default',
+              boxShadow: '0 8px 32px rgba(34, 197, 94, 0.3)',
+              textAlign: 'center'
+            }}
+          >
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(34, 197, 94, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px'
+            }}>
+              <FiCheck size={32} color="#22c55e" />
+            </div>
+            <h2 style={{ margin: '0 0 12px 0', fontSize: '24px', fontWeight: '600', color: '#fff' }}>
+              Thank You!
+            </h2>
+            <p style={{ margin: '0 0 8px 0', color: '#e0e0e0', fontSize: '16px', lineHeight: '1.5' }}>
+              Thank you for providing <strong style={{ color: '#22c55e' }}>{selectedAidCategory}</strong> to
+            </p>
+            <p style={{ margin: '0 0 20px 0', color: '#22c55e', fontSize: '16px', fontWeight: '600' }}>
+              {selectedShelter.operator}
+            </p>
+            <p style={{ margin: '0 0 24px 0', color: '#8e8e8e', fontSize: '14px', lineHeight: '1.5' }}>
+              Your contribution will help those affected by the emergency. Every bit of aid makes a difference.
+            </p>
+            <button
+              onClick={() => {
+                setShowAidThankYou(false);
+                setSelectedAidCategory('');
+                setSelectedShelter(null);
+              }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                backgroundColor: '#22c55e',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#16a34a';
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#22c55e';
+              }}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
