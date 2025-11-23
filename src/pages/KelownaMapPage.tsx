@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import { Link } from 'react-router-dom';
 import { FiMapPin, FiNavigation } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
@@ -20,6 +20,47 @@ interface Location {
 
 const KelownaMapPage: React.FC = () => {
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
+  
+  const ubcoPosition: [number, number] = [49.9400, -119.3950];
+  const academyWayPosition: [number, number] = [49.9200, -119.4000];
+  
+  const alertFireZone: [number, number][] = [
+    [49.9550, -119.4100],
+    [49.9500, -119.3800],
+    [49.9350, -119.3700],
+    [49.9150, -119.3750],
+    [49.9000, -119.3850],
+    [49.8950, -119.4000],
+    [49.9000, -119.4150],
+    [49.9100, -119.4200],
+    [49.9250, -119.4150],
+    [49.9400, -119.4100],
+    [49.9550, -119.4100],
+  ];
+
+  const orderFireZone1: [number, number][] = [
+    [49.9450, -119.4000],
+    [49.9400, -119.3850],
+    [49.9300, -119.3800],
+    [49.9200, -119.3850],
+    [49.9150, -119.3950],
+    [49.9200, -119.4050],
+    [49.9300, -119.4100],
+    [49.9400, -119.4050],
+    [49.9450, -119.4000],
+  ];
+
+  const orderFireZone2: [number, number][] = [
+    [49.9250, -119.3950],
+    [49.9200, -119.3900],
+    [49.9150, -119.3950],
+    [49.9100, -119.4000],
+    [49.9100, -119.4050],
+    [49.9150, -119.4100],
+    [49.9200, -119.4080],
+    [49.9250, -119.4000],
+    [49.9250, -119.3950],
+  ];
 
   const locations: Location[] = [
     { id: 1, name: 'Downtown Kelowna', position: [49.8880, -119.4960], type: 'Shelter' },
@@ -117,6 +158,89 @@ const KelownaMapPage: React.FC = () => {
             </Popup>
           </Marker>
         ))}
+
+        <Polygon
+          positions={alertFireZone}
+          pathOptions={{
+            color: '#ff8c00',
+            fillColor: '#ff8c00',
+            fillOpacity: 0.3,
+            weight: 2
+          }}
+        >
+          <Popup>
+            <div>
+              <strong>Alert-Fire</strong>
+              <p>Wildfire alert zone - UBCO & Academy Way Region</p>
+            </div>
+          </Popup>
+        </Polygon>
+
+        <Polygon
+          positions={orderFireZone1}
+          pathOptions={{
+            color: '#ed4956',
+            fillColor: '#ed4956',
+            fillOpacity: 0.7,
+            weight: 2
+          }}
+        >
+          <Popup>
+            <div>
+              <strong>Order-Fire</strong>
+              <p>Evacuation order zone - High intensity area</p>
+            </div>
+          </Popup>
+        </Polygon>
+
+        <Polygon
+          positions={orderFireZone2}
+          pathOptions={{
+            color: '#ed4956',
+            fillColor: '#ed4956',
+            fillOpacity: 0.7,
+            weight: 2
+          }}
+        >
+          <Popup>
+            <div>
+              <strong>Order-Fire</strong>
+              <p>Evacuation order zone - Academy Way area</p>
+            </div>
+          </Popup>
+        </Polygon>
+
+        <Marker position={academyWayPosition} icon={L.divIcon({
+          html: '<div style="color: #ed4956; font-size: 24px;">🔥</div>',
+          className: 'fire-icon',
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        })}>
+          <Popup>
+            <div>
+              <strong>Active Fire</strong>
+              <p>Fire location detected</p>
+            </div>
+          </Popup>
+        </Marker>
+
+        <Marker position={ubcoPosition}>
+          <Popup>
+            <div>
+              <strong>UBCO</strong>
+              <p>University of British Columbia Okanagan</p>
+            </div>
+          </Popup>
+        </Marker>
+
+        <Marker position={academyWayPosition}>
+          <Popup>
+            <div>
+              <strong>Academy Way</strong>
+              <p>Academy Way Area</p>
+            </div>
+          </Popup>
+        </Marker>
       </MapContainer>
 
       <div style={{
