@@ -554,19 +554,15 @@ const KelownaMapPage: React.FC = () => {
     const nonSOSMessages = existingMessages.filter((m: any) => !m.isSOS);
     const updatedMessages = [...sosMessages, ...nonSOSMessages];
     localStorage.setItem('dmMessages', JSON.stringify(updatedMessages));
-    localStorage.setItem('sosActive', 'true');
     localStorage.setItem('lastSOSTimestamp', sosTimestamp.toString());
+    localStorage.setItem('sosSentAfterLoad', 'true');
     
     setShowSharingOptions(false);
     
-    const event = new CustomEvent('sosSent', { 
-      detail: { 
-        timestamp: sosTimestamp,
-        messages: sosMessages 
-      } 
-    });
-    
-    window.dispatchEvent(event);
+    setTimeout(() => {
+      const event = new CustomEvent('sosSent');
+      window.dispatchEvent(event);
+    }, 50);
     
     setShowSOSConfirmation(true);
     setTimeout(() => {
@@ -904,7 +900,7 @@ const KelownaMapPage: React.FC = () => {
                   style={{
                     width: '100%',
                     padding: '12px',
-                    backgroundColor: sharingMode === 'disabled' ? 'rgba(255, 48, 64, 0.2)' : 'transparent',
+                    backgroundColor: isSharingLocation ? 'rgba(255, 48, 64, 0.2)' : 'transparent',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '8px',
@@ -917,22 +913,22 @@ const KelownaMapPage: React.FC = () => {
                     transition: 'background-color 0.2s'
                   }}
                   onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-                    if (sharingMode !== 'disabled') {
+                    if (!isSharingLocation) {
                       e.currentTarget.style.backgroundColor = '#262626';
                     }
                   }}
                   onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-                    if (sharingMode !== 'disabled') {
+                    if (!isSharingLocation) {
                       e.currentTarget.style.backgroundColor = 'transparent';
                     }
                   }}
                 >
-                  <FiX size={18} color={sharingMode === 'disabled' ? '#ff3040' : '#8e8e8e'} />
+                  <FiX size={18} color={isSharingLocation ? '#ff3040' : '#8e8e8e'} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: sharingMode === 'disabled' ? '600' : '400' }}>Disable Location</div>
+                    <div style={{ fontWeight: isSharingLocation ? '600' : '400' }}>Disable Location</div>
                     <div style={{ fontSize: '11px', color: '#8e8e8e', marginTop: '2px' }}>Stop sharing your location</div>
                   </div>
-                  {sharingMode === 'disabled' && <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff3040' }} />}
+                  {isSharingLocation && <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff3040' }} />}
                 </button>
               </div>
             </div>

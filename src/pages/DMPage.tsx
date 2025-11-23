@@ -66,20 +66,25 @@ const DMPage: React.FC = () => {
   ];
 
   useEffect(() => {
-    const pageLoadTime = Date.now();
-    const existingPageLoadTime = localStorage.getItem('dmPageLoadTime');
-    if (!existingPageLoadTime) {
-      localStorage.setItem('dmPageLoadTime', pageLoadTime.toString());
+    const appStartTime = sessionStorage.getItem('appStartTime');
+    const currentTime = Date.now().toString();
+    
+    if (!appStartTime) {
+      sessionStorage.setItem('appStartTime', currentTime);
+      localStorage.setItem('sosSentAfterLoad', 'false');
+      localStorage.removeItem('lastSOSTimestamp');
+      const storedMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+      const nonSOSMessages = storedMessages.filter((m: Message) => !m.isSOS);
+      localStorage.setItem('dmMessages', JSON.stringify(nonSOSMessages));
     }
 
     const loadMessages = () => {
       const storedMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+      const sosSentAfterLoad = localStorage.getItem('sosSentAfterLoad') === 'true';
       const lastSOSTimestamp = parseInt(localStorage.getItem('lastSOSTimestamp') || '0');
       
-      const nonSOSMessages = storedMessages.filter((m: Message) => !m.isSOS);
       let sosMessages: Message[] = [];
-      
-      if (lastSOSTimestamp > 0) {
+      if (sosSentAfterLoad && lastSOSTimestamp > 0) {
         sosMessages = storedMessages.filter((m: Message) => 
           m.isSOS && 
           m.sosSentAt && 
@@ -87,13 +92,17 @@ const DMPage: React.FC = () => {
         );
       }
       
+      const nonSOSMessages = storedMessages.filter((m: Message) => !m.isSOS);
+      
+      const defaultMessagesFiltered = defaultMessages.filter(dm => 
+        !nonSOSMessages.some((sm: Message) => sm.name === dm.name) &&
+        !sosMessages.some((sm: Message) => sm.name === dm.name)
+      );
+      
       const combinedMessages = [
         ...sosMessages,
         ...nonSOSMessages,
-        ...defaultMessages.filter(dm => 
-          !nonSOSMessages.some((sm: Message) => sm.id === dm.id) &&
-          !sosMessages.some((sm: Message) => sm.id === dm.id)
-        )
+        ...defaultMessagesFiltered
       ];
       
       setMessages(combinedMessages);
@@ -101,31 +110,18 @@ const DMPage: React.FC = () => {
 
     loadMessages();
 
-    const handleSOSSent = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail && customEvent.detail.timestamp) {
-        setTimeout(() => {
-          loadMessages();
-        }, 100);
-      }
+    const handleSOSSent = () => {
+      loadMessages();
     };
 
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'dmMessages' || e.key === 'lastSOSTimestamp') {
-        loadMessages();
-      }
-    };
-
-    window.addEventListener('sosSent', handleSOSSent as EventListener);
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('sosSent', handleSOSSent);
     
     const interval = setInterval(() => {
       loadMessages();
-    }, 300);
+    }, 200);
 
     return () => {
-      window.removeEventListener('sosSent', handleSOSSent as EventListener);
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('sosSent', handleSOSSent);
       clearInterval(interval);
     };
   }, []);
