@@ -58,14 +58,14 @@ const InstagramHomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const stories: Story[] = [
-    { id: 1, username: 'aryanx_c728', image: 'https://picsum.photos/seed/story1/150/150' },
-    { id: 2, username: 'farmal_ch', image: 'https://picsum.photos/seed/story2/150/150' },
-    { id: 3, username: 'chloedsou', image: 'https://picsum.photos/seed/story3/150/150' },
-    { id: 4, username: 'itsvik_mzr', image: 'https://picsum.photos/seed/story4/150/150' },
-    { id: 5, username: '_shreya.pa', image: 'https://picsum.photos/seed/story5/150/150' },
-    { id: 6, username: 'riddzrosh_', image: 'https://picsum.photos/seed/story6/150/150' },
-    { id: 7, username: 'user7', image: 'https://picsum.photos/seed/story7/150/150' },
-    { id: 8, username: 'user8', image: 'https://picsum.photos/seed/story8/150/150' },
+    { id: 1, username: 'jennifer_m', image: 'https://picsum.photos/seed/story1/150/150' },
+    { id: 2, username: 'mike_travel', image: 'https://picsum.photos/seed/story2/150/150' },
+    { id: 3, username: 'sarah_photo', image: 'https://picsum.photos/seed/story3/150/150' },
+    { id: 4, username: 'alex_fitness', image: 'https://picsum.photos/seed/story4/150/150' },
+    { id: 5, username: 'emma_food', image: 'https://picsum.photos/seed/story5/150/150' },
+    { id: 6, username: 'david_art', image: 'https://picsum.photos/seed/story6/150/150' },
+    { id: 7, username: 'lisa_music', image: 'https://picsum.photos/seed/story7/150/150' },
+    { id: 8, username: 'tom_tech', image: 'https://picsum.photos/seed/story8/150/150' },
   ];
 
   const posts: Post[] = [
@@ -136,32 +136,32 @@ const InstagramHomePage: React.FC = () => {
   const suggestedUsers: SuggestedUser[] = [
     {
       id: 1,
-      username: 'MEMEZAR',
-      fullName: 'MEMES &...',
+      username: 'creative_studio',
+      fullName: 'Creative Studio',
       image: 'https://picsum.photos/seed/suggest1/40/40',
       verified: true,
-      mutualFollowers: 'sriya_sd + 74 m'
+      mutualFollowers: 'jennifer_m + 74 m'
     },
     {
       id: 2,
-      username: 'Shrey',
-      fullName: '',
+      username: 'nature_lover',
+      fullName: 'Nature Enthusiast',
       image: 'https://picsum.photos/seed/suggest2/40/40',
-      mutualFollowers: 'aaq1b._'
+      mutualFollowers: 'mike_travel'
     },
     {
       id: 3,
-      username: 'Keya',
-      fullName: '',
+      username: 'fashion_blog',
+      fullName: 'Fashion Blog',
       image: 'https://picsum.photos/seed/suggest3/40/40',
-      mutualFollowers: 'sriya_sd + 27 m'
+      mutualFollowers: 'sarah_photo + 27 m'
     },
     {
       id: 4,
-      username: 'urvi',
-      fullName: '',
+      username: 'foodie_world',
+      fullName: 'Foodie World',
       image: 'https://picsum.photos/seed/suggest4/40/40',
-      mutualFollowers: 'raihanfirosh05 +'
+      mutualFollowers: 'emma_food +'
     },
   ];
 
@@ -204,7 +204,7 @@ const InstagramHomePage: React.FC = () => {
           onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
         />
         <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => navigate('/dm')}>
-          <HiOutlinePaperAirplane size={24} />
+          <HiOutlinePaperAirplane size={24} style={{ transform: 'rotate(45deg)' }} />
           <div style={{
             position: 'absolute',
             top: '-4px',
@@ -277,7 +277,9 @@ const InstagramHomePage: React.FC = () => {
         marginRight: '320px',
         flex: 1,
         maxWidth: '614px',
-        padding: '0 20px',
+        width: '100%',
+        margin: '0 auto',
+        padding: '0',
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
@@ -285,7 +287,7 @@ const InstagramHomePage: React.FC = () => {
       }}>
         {/* Stories Section */}
         <div style={{
-          padding: '24px 0 16px 0',
+          padding: '24px 20px 16px 20px',
           borderBottom: '1px solid #262626',
           marginBottom: '0'
         }}>
@@ -364,7 +366,7 @@ const InstagramHomePage: React.FC = () => {
         </div>
 
         {/* Posts Feed */}
-        <div style={{ flex: 1, overflowY: 'auto', paddingTop: '24px', paddingBottom: '80px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', paddingTop: '24px', paddingBottom: '80px', paddingLeft: '20px', paddingRight: '20px' }}>
           {posts.map((post) => (
             <div
               key={post.id}
@@ -509,8 +511,8 @@ const InstagramHomePage: React.FC = () => {
               }}
             />
             <div>
-              <div style={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>arynnrosh</div>
-              <div style={{ fontSize: '14px', color: '#8e8e8e' }}>aryan roshan</div>
+              <div style={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>jordan_smith</div>
+              <div style={{ fontSize: '14px', color: '#8e8e8e' }}>Jordan Smith</div>
             </div>
           </div>
           <button

@@ -12,7 +12,8 @@ import {
   HiOutlineHome, 
   HiOutlineSearch,
   HiOutlineFilm,
-  HiOutlineHeart
+  HiOutlineHeart,
+  HiOutlinePaperAirplane
 } from 'react-icons/hi';
 import { 
   MdOutlineAddBox,
@@ -155,6 +156,25 @@ const DMPage: React.FC = () => {
         <HiOutlineHome size={24} style={{ cursor: 'pointer' }} onClick={() => navigate('/home')} />
         <HiOutlineSearch size={24} style={{ cursor: 'pointer' }} />
         <HiOutlineFilm size={24} style={{ cursor: 'pointer' }} />
+        <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => navigate('/dm')}>
+          <HiOutlinePaperAirplane size={24} style={{ transform: 'rotate(45deg)', opacity: 1 }} />
+          <div style={{
+            position: 'absolute',
+            top: '-4px',
+            right: '-4px',
+            width: '18px',
+            height: '18px',
+            borderRadius: '50%',
+            backgroundColor: '#ed4956',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '10px',
+            fontWeight: '600'
+          }}>
+            4
+          </div>
+        </div>
         <div style={{ position: 'relative', cursor: 'pointer' }}>
           <HiOutlineHeart size={24} />
           <div style={{
@@ -171,7 +191,7 @@ const DMPage: React.FC = () => {
             fontSize: '10px',
             fontWeight: '600'
           }}>
-            3
+            4
           </div>
         </div>
         <MdOutlineAddBox size={24} style={{ cursor: 'pointer' }} />
@@ -203,7 +223,7 @@ const DMPage: React.FC = () => {
           alignItems: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px', fontWeight: '600' }}>imtiaz._.n</span>
+            <span style={{ fontSize: '16px', fontWeight: '600' }}>jordan_smith</span>
             <FiChevronRight size={16} style={{ color: '#8e8e8e' }} />
           </div>
           <FiEdit3 size={20} style={{ cursor: 'pointer' }} />

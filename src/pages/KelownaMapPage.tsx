@@ -337,6 +337,13 @@ const KelownaMapPage: React.FC = () => {
       date: '2024-09-10',
       image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop'
     },
+    { 
+      id: 4, 
+      title: 'Sunset View', 
+      position: [49.8500, -119.6000], 
+      date: '2024-06-25',
+      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop'
+    },
   ];
 
 
@@ -997,36 +1004,38 @@ const KelownaMapPage: React.FC = () => {
         {/* Fire Zones - Only show in SOS mode */}
         {mapMode === 'sos' && (
           <>
+            {/* Orange zone - Wildfire information area (rendered first, so it's below) */}
             <Polygon
               positions={alertFireZone}
               pathOptions={{
-                color: '#ff3040',
-                fillColor: '#ff3040',
+                color: '#ff9500',
+                fillColor: '#ff9500',
                 fillOpacity: 0.3,
                 weight: 2
               }}
             >
               <Popup>
                 <div>
-                  <strong>Fire Alert Zone</strong>
-                  <p>High risk area - evacuation may be required</p>
+                  <strong>Wildfire Information Zone</strong>
+                  <p>Area with active wildfire information</p>
                 </div>
               </Popup>
             </Polygon>
             
+            {/* Red zones - More affected areas (rendered after, so they're on top) */}
             <Polygon
               positions={orderFireZone1}
               pathOptions={{
-                color: '#ff9500',
-                fillColor: '#ff9500',
-                fillOpacity: 0.25,
+                color: '#ff3040',
+                fillColor: '#ff3040',
+                fillOpacity: 0.35,
                 weight: 2
               }}
             >
               <Popup>
                 <div>
-                  <strong>Evacuation Order Zone 1</strong>
-                  <p>Evacuation order in effect</p>
+                  <strong>High Risk Zone 1</strong>
+                  <p>More affected area - immediate evacuation required</p>
                 </div>
               </Popup>
             </Polygon>
@@ -1034,16 +1043,16 @@ const KelownaMapPage: React.FC = () => {
             <Polygon
               positions={orderFireZone2}
               pathOptions={{
-                color: '#ff9500',
-                fillColor: '#ff9500',
-                fillOpacity: 0.25,
+                color: '#ff3040',
+                fillColor: '#ff3040',
+                fillOpacity: 0.35,
                 weight: 2
               }}
             >
               <Popup>
                 <div>
-                  <strong>Evacuation Order Zone 2</strong>
-                  <p>Evacuation order in effect</p>
+                  <strong>High Risk Zone 2</strong>
+                  <p>More affected area - immediate evacuation required</p>
                 </div>
               </Popup>
             </Polygon>
@@ -1262,53 +1271,6 @@ const KelownaMapPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Info Panel */}
-      {mapMode === 'map' && (
-        <div style={{
-          position: 'absolute',
-          bottom: '90px',
-          left: '20px',
-          zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          padding: '16px',
-          borderRadius: '16px',
-          color: '#fff',
-          maxWidth: '300px',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          transition: 'opacity 0.3s ease'
-        }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '600' }}>Kelowna, BC</h3>
-          <p style={{ margin: '0 0 12px 0', color: '#a8a8a8', fontSize: '14px', lineHeight: '1.4' }}>
-            Explore the map to find shelters and view your memories.
-          </p>
-          <div style={{ 
-            display: 'flex', 
-            gap: '8px', 
-            flexWrap: 'wrap',
-            marginTop: '12px'
-          }}>
-            {memories.map((memory) => (
-              <span 
-                key={memory.id}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: 'rgba(255, 48, 64, 0.2)',
-                  borderRadius: '12px',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  border: '1px solid rgba(255, 48, 64, 0.3)'
-                }}
-              >
-                <FiHeart size={12} color="#ff3040" />
-                {memory.title}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
 
       {mapMode === 'sos' && (
         <div style={{
