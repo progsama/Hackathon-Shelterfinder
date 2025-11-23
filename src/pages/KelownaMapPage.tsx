@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Link } from 'react-router-dom';
 import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle } from 'react-icons/fi';
@@ -30,6 +29,47 @@ interface Memory {
 const KelownaMapPage: React.FC = () => {
   const [mapMode, setMapMode] = useState<'map' | 'sos'>('map');
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
+  
+  const ubcoPosition: [number, number] = [49.9400, -119.3950];
+  const academyWayPosition: [number, number] = [49.9200, -119.4000];
+  
+  const alertFireZone: [number, number][] = [
+    [49.9550, -119.4100],
+    [49.9500, -119.3800],
+    [49.9350, -119.3700],
+    [49.9150, -119.3750],
+    [49.9000, -119.3850],
+    [49.8950, -119.4000],
+    [49.9000, -119.4150],
+    [49.9100, -119.4200],
+    [49.9250, -119.4150],
+    [49.9400, -119.4100],
+    [49.9550, -119.4100],
+  ];
+
+  const orderFireZone1: [number, number][] = [
+    [49.9450, -119.4000],
+    [49.9400, -119.3850],
+    [49.9300, -119.3800],
+    [49.9200, -119.3850],
+    [49.9150, -119.3950],
+    [49.9200, -119.4050],
+    [49.9300, -119.4100],
+    [49.9400, -119.4050],
+    [49.9450, -119.4000],
+  ];
+
+  const orderFireZone2: [number, number][] = [
+    [49.9250, -119.3950],
+    [49.9200, -119.3900],
+    [49.9150, -119.3950],
+    [49.9100, -119.4000],
+    [49.9100, -119.4050],
+    [49.9150, -119.4100],
+    [49.9200, -119.4080],
+    [49.9250, -119.4000],
+    [49.9250, -119.3950],
+  ];
 
   const locations: Location[] = [
     { id: 1, name: 'Downtown Kelowna', position: [49.8880, -119.4960], type: 'Shelter' },
@@ -130,49 +170,16 @@ const KelownaMapPage: React.FC = () => {
           </Popup>
         </Marker>
 
-        {mapMode === 'map' ? (
-          <>
-            {locations.map((location) => (
-              <Marker key={location.id} position={location.position}>
-                <Popup>
-                  <div>
-                    <strong>{location.name}</strong>
-                    <p>Type: {location.type}</p>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-            {memories.map((memory) => (
-              <Marker key={`memory-${memory.id}`} position={memory.position}>
-                <Popup>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                      <FiHeart size={16} color="#ff3040" />
-                      <strong>{memory.title}</strong>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>{memory.date}</p>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </>
-        ) : (
-          <>
-            {sosLocations.map((location) => (
-              <Marker key={`sos-${location.id}`} position={location.position}>
-                <Popup>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                      <FiAlertCircle size={16} color="#ff3040" />
-                      <strong>{location.name}</strong>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>Type: {location.type}</p>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </>
-        )}
+        {locations.map((location) => (
+          <Marker key={location.id} position={location.position}>
+            <Popup>
+              <div>
+                <strong>{location.name}</strong>
+                <p>Type: {location.type}</p>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
       </MapContainer>
 
       {/* Instagram-style Toggle Button */}

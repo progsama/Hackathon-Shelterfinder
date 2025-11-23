@@ -218,7 +218,7 @@ const DMPage: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '2px solid #fff'
+                    border: note.id === 1 ? '4px solid #ed4956' : '2px solid #fff'
                   }}>
                     <span style={{ fontSize: '20px' }}>📝</span>
                   </div>
