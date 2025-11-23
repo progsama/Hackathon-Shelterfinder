@@ -1059,14 +1059,21 @@ const MapPage: React.FC = () => {
               }}
             >
               <Popup>
-                <div>
-                  <strong>Wildfire Information Zone</strong>
-                  <p>Area with active wildfire information</p>
+                <div style={{ minWidth: '200px' }}>
+                  <strong style={{ fontSize: '16px', color: '#ff9500', display: 'block', marginBottom: '8px' }}>
+                    Moderate Fire Zone
+                  </strong>
+                  <p style={{ margin: '4px 0', fontSize: '14px', lineHeight: '1.5' }}>
+                    This area is experiencing moderate fire activity. Active wildfires have been detected, and conditions may change rapidly.
+                  </p>
+                  <p style={{ margin: '4px 0', fontSize: '13px', color: '#666', fontStyle: 'italic' }}>
+                    Stay informed and be prepared to evacuate if conditions worsen.
+                  </p>
                 </div>
               </Popup>
             </Polygon>
             
-            {/* Red zones - More affected areas (rendered after, so they're on top) */}
+            {/* Red zones - High level fire danger (rendered after, so they're on top) */}
             <Polygon
               positions={orderFireZone1}
               pathOptions={{
@@ -1077,26 +1084,41 @@ const MapPage: React.FC = () => {
               }}
             >
               <Popup>
-                <div>
-                  <strong>High Risk Zone 1</strong>
-                  <p>More affected area - immediate evacuation required</p>
+                <div style={{ minWidth: '200px' }}>
+                  <strong style={{ fontSize: '16px', color: '#ff3040', display: 'block', marginBottom: '8px' }}>
+                    High Level Fire Danger Zone
+                  </strong>
+                  <p style={{ margin: '4px 0', fontSize: '14px', lineHeight: '1.5' }}>
+                    This area is under high level fire danger. Active, spreading wildfires pose significant risk to life and property.
+                  </p>
+                  <p style={{ margin: '4px 0', fontSize: '13px', color: '#ff3040', fontWeight: '600' }}>
+                    Immediate evacuation is strongly recommended. Follow emergency services instructions.
+                  </p>
                 </div>
               </Popup>
             </Polygon>
             
+            {/* Overlap zone - Extreme fire danger (where both red zones overlap, rendered last so it's on top) */}
             <Polygon
               positions={orderFireZone2}
               pathOptions={{
-                color: '#ff3040',
-                fillColor: '#ff3040',
-                fillOpacity: 0.35,
-                weight: 2
+                color: '#cc0000',
+                fillColor: '#cc0000',
+                fillOpacity: 0.5,
+                weight: 3
               }}
             >
               <Popup>
-                <div>
-                  <strong>High Risk Zone 2</strong>
-                  <p>More affected area - immediate evacuation required</p>
+                <div style={{ minWidth: '220px' }}>
+                  <strong style={{ fontSize: '17px', color: '#cc0000', display: 'block', marginBottom: '8px' }}>
+                    ⚠️ Extreme Level Fire Danger Zone
+                  </strong>
+                  <p style={{ margin: '4px 0', fontSize: '14px', lineHeight: '1.5', fontWeight: '600' }}>
+                    This area is experiencing extreme fire conditions with multiple overlapping high-risk zones. The convergence of fire activity creates an exceptionally dangerous situation.
+                  </p>
+                  <p style={{ margin: '4px 0', fontSize: '13px', color: '#cc0000', fontWeight: '700', backgroundColor: '#ffe6e6', padding: '6px', borderRadius: '4px' }}>
+                    🚨 EVACUATE IMMEDIATELY. Do not delay. This is the highest risk area.
+                  </p>
                 </div>
               </Popup>
             </Polygon>
