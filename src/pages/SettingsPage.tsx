@@ -12,18 +12,19 @@ import {
   FiMessageCircle
 } from 'react-icons/fi';
 import { 
+  HiHome,
   HiOutlineHome, 
   HiOutlineSearch,
   HiOutlineFilm,
-  HiOutlineHeart
+  HiOutlineHeart,
+  HiOutlinePaperAirplane
 } from 'react-icons/hi';
 import { 
   MdOutlineAddBox,
   MdOutlineMenu
 } from 'react-icons/md';
 import { 
-  BsGrid3X3,
-  BsCompass
+  BsGrid3X3
 } from 'react-icons/bs';
 
 const SettingsPage: React.FC = () => {
@@ -45,88 +46,106 @@ const SettingsPage: React.FC = () => {
     <div style={{ display: 'flex', height: '100vh', backgroundColor: '#000', color: '#fff' }}>
       {/* Left Navigation Sidebar */}
       <div style={{
-        width: '240px',
+        width: '72px',
         borderRight: '1px solid #262626',
         backgroundColor: '#000',
         display: 'flex',
         flexDirection: 'column',
-        padding: '8px 12px'
+        alignItems: 'center',
+        paddingTop: '8px',
+        gap: '24px',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        height: '100vh',
+        zIndex: 10
       }}>
         {/* Instagram Logo */}
-        <div style={{ padding: '12px 0', cursor: 'pointer' }}>
+        <div style={{ padding: '12px', cursor: 'pointer' }} onClick={() => navigate('/home')}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
           </svg>
         </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}>
-            <HiOutlineHome size={24} />
-            <span style={{ fontSize: '16px' }}>Home</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}>
-            <HiOutlineSearch size={24} />
-            <span style={{ fontSize: '16px' }}>Search</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}>
-            <BsCompass size={24} />
-            <span style={{ fontSize: '16px' }}>Explore</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}>
-            <HiOutlineFilm size={24} />
-            <span style={{ fontSize: '16px' }}>Reels</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', cursor: 'pointer', borderRadius: '8px', position: 'relative' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            <span style={{ fontSize: '16px' }}>Messages</span>
-            <div style={{
-              position: 'absolute',
-              left: '32px',
-              width: '18px',
-              height: '18px',
-              borderRadius: '50%',
-              backgroundColor: '#ed4956',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '10px',
-              fontWeight: '600'
-            }}>
-              3
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}>
-            <HiOutlineHeart size={24} />
-            <span style={{ fontSize: '16px' }}>Notifications</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}>
-            <MdOutlineAddBox size={24} />
-            <span style={{ fontSize: '16px' }}>Create</span>
-          </div>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '16px', 
-            padding: '12px', 
-            cursor: 'pointer', 
-            borderRadius: '8px',
-            backgroundColor: '#1a1a1a'
+        
+        <HiHome size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} 
+          onClick={() => navigate('/home')}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
+        <HiOutlineSearch size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
+        <HiOutlineFilm size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
+        <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => navigate('/dm')}>
+          <HiOutlinePaperAirplane size={24} style={{ transform: 'rotate(45deg)' }} />
+          <div style={{
+            position: 'absolute',
+            top: '-4px',
+            right: '-4px',
+            width: '18px',
+            height: '18px',
+            borderRadius: '50%',
+            backgroundColor: '#ed4956',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '10px',
+            fontWeight: '600'
           }}>
-            <div style={{
-              width: '24px',
-              height: '24px',
-              borderRadius: '50%',
-              backgroundColor: '#262626'
-            }} />
-            <span style={{ fontSize: '16px', fontWeight: '600' }}>Profile</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}>
-            <MdOutlineMenu size={24} />
-            <span style={{ fontSize: '16px' }}>More</span>
+            4
           </div>
         </div>
+        <div style={{ position: 'relative', cursor: 'pointer' }}>
+          <HiOutlineHeart size={24} />
+          <div style={{
+            position: 'absolute',
+            top: '-4px',
+            right: '-4px',
+            width: '18px',
+            height: '18px',
+            borderRadius: '50%',
+            backgroundColor: '#ed4956',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '10px',
+            fontWeight: '600'
+          }}>
+            4
+          </div>
+        </div>
+        <MdOutlineAddBox size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
+        <div style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '50%',
+          backgroundColor: '#262626',
+          cursor: 'pointer',
+          backgroundImage: 'url(https://i.pinimg.com/564x/3a/3f/8a/3a3f8a5e5e5e5e5e5e5e5e5e5e5e5e5e5.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          border: '1px solid #262626',
+          transition: 'opacity 0.2s'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
+        <MdOutlineMenu size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} 
+          onClick={() => navigate('/settings')}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
+        <BsGrid3X3 size={20} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
       </div>
 
       {/* Middle Section - Settings Menu */}
@@ -135,7 +154,8 @@ const SettingsPage: React.FC = () => {
         borderRight: '1px solid #262626',
         backgroundColor: '#000',
         padding: '24px 0',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        marginLeft: '72px'
       }}>
         <div style={{ padding: '0 24px 24px', borderBottom: '1px solid #262626' }}>
           <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>Settings</h1>
@@ -298,7 +318,8 @@ const SettingsPage: React.FC = () => {
           flex: 1,
           backgroundColor: '#000',
           padding: '24px',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          marginLeft: '0'
         }}>
           <h2 style={{ margin: '0 0 24px 0', fontSize: '20px', fontWeight: '600' }}>Edit profile</h2>
 

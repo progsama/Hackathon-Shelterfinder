@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { FiHeart } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { Memory, Location } from './mapTypes';
 
-delete L.Icon.Default.prototype._getIconUrl;
+interface Memory {
+  id: number;
+  title: string;
+  position: [number, number];
+  date: string;
+  image?: string;
+}
+
+interface Location {
+  id: number;
+  name: string;
+  position: [number, number];
+  type: string;
+}
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -113,7 +127,7 @@ const createMemoryIcon = (memory: Memory, index: number): L.DivIcon => {
   });
 };
 
-interface RegularMapProps {
+interface ShelterfindrProps {
   kelownaPosition: [number, number];
   memories: Memory[];
   locations: Location[];
@@ -121,7 +135,7 @@ interface RegularMapProps {
   onMemorySelect: (memory: Memory | null) => void;
 }
 
-const RegularMap: React.FC<RegularMapProps> = ({
+const Shelterfindr: React.FC<ShelterfindrProps> = ({
   kelownaPosition,
   memories,
   locations,
@@ -389,5 +403,5 @@ const RegularMap: React.FC<RegularMapProps> = ({
   );
 };
 
-export default RegularMap;
+export default Shelterfindr;
 
