@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
-import { Link } from 'react-router-dom';
-import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -25,6 +25,17 @@ interface Memory {
   position: [number, number];
   date: string;
   image?: string;
+}
+
+interface Shelter {
+  id: number;
+  operator: string;
+  address: string;
+  position: [number, number];
+  type: string;
+  beds: number;
+  phone: string;
+  website?: string;
 }
 
 // Create custom thumbnail icon for memories
@@ -164,9 +175,41 @@ const createSOSIcon = (zone: 'alert' | 'order1' | 'order2', _type: string): L.Di
   });
 };
 
+// Create green house icon for shelters
+const createShelterIcon = (): L.DivIcon => {
+  return L.divIcon({
+    className: 'shelter-marker',
+    html: `
+      <div style="
+        width: 0;
+        height: 0;
+        position: relative;
+      ">
+        <svg width="28" height="28" viewBox="0 0 28 28" style="
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+          cursor: pointer;
+        ">
+          <!-- House roof -->
+          <path d="M14 2 L4 10 L4 24 L10 24 L10 16 L18 16 L18 24 L24 24 L24 10 Z" 
+            fill="#22c55e" 
+            stroke="#fff" 
+            stroke-width="1.5"/>
+          <!-- Door -->
+          <rect x="12" y="18" width="4" height="6" fill="#fff" opacity="0.8"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28],
+  });
+};
+
 const KelownaMapPage: React.FC = () => {
+  const navigate = useNavigate();
   const [mapMode, setMapMode] = useState<'map' | 'sos'>('map');
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+  const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
   
   const ubcoPosition: [number, number] = [49.9400, -119.3950];
@@ -261,6 +304,105 @@ const KelownaMapPage: React.FC = () => {
     { id: 5, name: 'Evacuation Center', position: [orderZone2Center[0] + 0.001, orderZone2Center[1] + 0.001], type: 'Emergency', zone: 'order2' },
     { id: 6, name: 'Medical Aid Station', position: [orderZone2Center[0] - 0.001, orderZone2Center[1] - 0.001], type: 'Medical', zone: 'order2' },
   ];
+
+  // Shelter data from screenshots
+  const shelters: Shelter[] = [
+    {
+      id: 1,
+      operator: 'John Howard Society of Okanagan & Kootenay',
+      address: '425 Leon Ave, Kelowna, V1Y 6J4',
+      position: [49.8880, -119.4960], // Approximate coordinates for Leon Ave
+      type: 'Temporary Shelter - All clients 19+',
+      beds: 80,
+      phone: '250-317-6678',
+      website: 'http://www.johnhowardbc.ca/regions/cso/welcome/'
+    },
+    {
+      id: 2,
+      operator: 'Turning Points Collaborative Society',
+      address: '1083 Richter Street, Kelowna, V1Y 2K6',
+      position: [49.8900, -119.4940], // Approximate coordinates for Richter St
+      type: 'Year-Round Shelters - All Clients 19+',
+      beds: 48,
+      phone: '778-212-1401',
+      website: 'http://turningpoints.ngo/'
+    },
+    {
+      id: 3,
+      operator: 'New Opportunities for Women (NOW) Canada Society',
+      address: '2609 Richter Street, Kelowna, V1Y 2R3',
+      position: [49.8950, -119.4920], // Approximate coordinates for Richter St
+      type: 'Year-Round Shelters - Women and children',
+      beds: 20,
+      phone: '250-763-2262',
+      website: 'www.nowcanada.ca'
+    },
+    {
+      id: 4,
+      operator: 'Okanagan Boys and Girls Clubs',
+      address: '1633 Richter Street, Kelowna, V1Y 9T7',
+      position: [49.8920, -119.4930], // Approximate coordinates for Richter St
+      type: 'Temporary Shelter - Young Adults (19-24 Years Old)',
+      beds: 5,
+      phone: '(250) 718-7620'
+    },
+    {
+      id: 5,
+      operator: 'Turning Points Collaborative Society',
+      address: '2500 Bartley Court, West Kelowna, V1Z 2M8',
+      position: [49.8500, -119.6000], // Approximate coordinates for West Kelowna
+      type: 'Year-Round Shelters - All Clients 19+',
+      beds: 38,
+      website: 'http://turningpoints.ngo/'
+    },
+    {
+      id: 6,
+      operator: 'Kelowna Gospel Mission Society',
+      address: '858 Ellis Street, Kelowna, V1W 0A1',
+      position: [49.8860, -119.4980], // Approximate coordinates for Ellis St
+      type: 'Temporary Shelter - All Clients 19+',
+      beds: 72,
+      phone: '(236) 420-0899'
+    },
+    {
+      id: 7,
+      operator: 'Turning Points Collaborative Society',
+      address: 'Kelowna, BC',
+      position: [49.8880, -119.4950], // Approximate coordinates
+      type: 'Temporary Shelter - All Clients 19+',
+      beds: 30,
+      phone: '778-583-3093'
+    },
+    {
+      id: 8,
+      operator: 'Kelowna Gospel Mission Society',
+      address: '251 Leon Avenue, Kelowna, V1Y 6J1',
+      position: [49.8880, -119.4960], // Approximate coordinates for Leon Ave
+      type: 'Year-Round Shelters - Men 19+ only',
+      beds: 60,
+      phone: '250-763-3737',
+      website: 'http://www.kelownagospelmission.ca'
+    },
+    {
+      id: 9,
+      operator: 'New Opportunities for Women (NOW) Canada Society',
+      address: '1069 Gordon Drive, Kelowna, V1Y 3E3',
+      position: [49.8700, -119.4800], // Approximate coordinates for Gordon Dr
+      type: 'Year-Round Shelters - Women and Children',
+      beds: 20,
+      phone: '778-484-9927',
+      website: 'https://www.nowcanada.ca'
+    }
+  ];
+
+  const handleGetDirections = (shelter: Shelter) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${shelter.position[0]},${shelter.position[1]}`;
+    window.open(url, '_blank');
+  };
+
+  const handleReserveSpots = (shelter: Shelter) => {
+    navigate('/reservation', { state: { shelter } });
+  };
 
   return (
     <div style={{ height: '100vh', width: '100vw', position: 'relative', backgroundColor: '#000' }}>
@@ -448,6 +590,18 @@ const KelownaMapPage: React.FC = () => {
               </div>
             </Popup>
           </Marker>
+        ))}
+
+        {/* Shelter Markers - Only show in SOS mode */}
+        {mapMode === 'sos' && shelters.map((shelter) => (
+          <Marker 
+            key={shelter.id} 
+            position={shelter.position}
+            icon={createShelterIcon()}
+            eventHandlers={{
+              click: () => setSelectedShelter(shelter)
+            }}
+          />
         ))}
 
         {/* SOS Location Markers - Only show in SOS mode, aligned to zones */}
@@ -643,6 +797,196 @@ const KelownaMapPage: React.FC = () => {
                 {loc.name}
               </span>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Shelter Info Modal */}
+      {selectedShelter && (
+        <div
+          onClick={() => setSelectedShelter(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#1a1a1a',
+              borderRadius: '16px',
+              padding: '24px',
+              maxWidth: '400px',
+              width: '90%',
+              border: '1px solid #262626',
+              cursor: 'default'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#fff' }}>
+                {selectedShelter.operator}
+              </h2>
+              <button
+                onClick={() => setSelectedShelter(null)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#262626';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div style={{ color: '#8e8e8e', fontSize: '14px', marginBottom: '12px' }}>
+              <div style={{ marginBottom: '8px' }}>
+                <strong style={{ color: '#22c55e' }}>OPERATOR:</strong> {selectedShelter.operator}
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong style={{ color: '#22c55e' }}>ADDRESS:</strong> {selectedShelter.address}
+              </div>
+              {selectedShelter.website && (
+                <div style={{ marginBottom: '8px' }}>
+                  <strong style={{ color: '#22c55e' }}>WEBSITE:</strong>{' '}
+                  <a 
+                    href={selectedShelter.website.startsWith('http') ? selectedShelter.website : `https://${selectedShelter.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#0095f6', textDecoration: 'underline' }}
+                  >
+                    {selectedShelter.website}
+                  </a>
+                </div>
+              )}
+              <div style={{ marginBottom: '8px' }}>
+                <strong style={{ color: '#22c55e' }}>NUMBER OF BEDS:</strong> {selectedShelter.beds}
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong style={{ color: '#22c55e' }}>TYPE:</strong> {selectedShelter.type}
+              </div>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              marginTop: '20px'
+            }}>
+              <button
+                onClick={() => handleGetDirections(selectedShelter)}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  backgroundColor: '#22c55e',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#16a34a';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#22c55e';
+                }}
+              >
+                <FiExternalLink size={16} />
+                Get Directions
+              </button>
+              <button
+                onClick={() => handleReserveSpots(selectedShelter)}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  backgroundColor: '#22c55e',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#16a34a';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#22c55e';
+                }}
+              >
+                Reserve Spots
+              </button>
+            </div>
+
+            {selectedShelter.phone && (
+              <a
+                href={`tel:${selectedShelter.phone.replace(/[^0-9]/g, '')}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: '12px',
+                  padding: '12px',
+                  backgroundColor: '#22c55e',
+                  color: '#fff',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                  e.currentTarget.style.backgroundColor = '#16a34a';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                  e.currentTarget.style.backgroundColor = '#22c55e';
+                }}
+              >
+                <FiPhone size={16} />
+                {selectedShelter.phone}
+              </a>
+            )}
           </div>
         </div>
       )}
