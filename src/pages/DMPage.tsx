@@ -36,6 +36,15 @@ interface Message {
   location?: [number, number];
   locationText?: string;
   sosSentAt?: number;
+  isForumInvite?: boolean;
+  forumPreview?: ForumMessage[];
+}
+
+interface ForumMessage {
+  id: number;
+  author: string;
+  message: string;
+  time: string;
 }
 
 interface Note {
@@ -48,13 +57,33 @@ const DMPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'messages' | 'requests'>('messages');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [showForumPreview, setShowForumPreview] = useState<Message | null>(null);
 
   const notes: Note[] = [
     { id: 1, text: 'Your note' },
     { id: 2, text: 'Map', isMap: true },
   ];
 
+  const forumPreviewMessages: ForumMessage[] = [
+    { id: 1, author: 'Sarah M.', message: '🔥 Current fire status: The wildfire has spread to the Rutland and University South areas. Extreme danger zones are marked in red on the map.', time: '2h' },
+    { id: 2, author: 'Mike T.', message: '🏥 Aid available: Born to Shake on Vaughan Ave is providing ice, water, and coffee. Pretty Not Bad on Clement Ave has free lunch for evacuees.', time: '1h' },
+    { id: 3, author: 'Emma L.', message: '🏠 Shelter update: John Howard Society on Leon Ave has 80 beds available. Kelowna Gospel Mission on Ellis St has 72 beds. Check the map for all shelter locations!', time: '45m' },
+    { id: 4, author: 'David K.', message: '⚠️ Fire progression: The orange zone indicates moderate fire activity. Red zones show high danger. The overlap area (dark red) is extreme - avoid at all costs!', time: '30m' },
+    { id: 5, author: 'Lisa P.', message: '🚨 Emergency services: Kelowna General Hospital and Urgent Care Centre are operational. Fire stations are on high alert. Stay safe everyone!', time: '15m' },
+  ];
+
+  const forumInviteMessage: Message = {
+    id: 999,
+    name: 'Kelowna Wildfire Community Forum',
+    lastMessage: 'Join the community discussion about the current wildfire situation',
+    time: '1h',
+    unread: true,
+    isForumInvite: true,
+    forumPreview: forumPreviewMessages
+  };
+
   const defaultMessages: Message[] = [
+    forumInviteMessage,
     { id: 1, name: 'God Usopp', lastMessage: 'I\'m not lying!', time: '18m', unread: true },
     { id: 2, name: 'Itachi Uchiha', lastMessage: 'brb got some biz with the clan', time: '59m', unread: true },
     { id: 3, name: 'Levi Ackerman', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
@@ -100,10 +129,15 @@ const DMPage: React.FC = () => {
         !sosMessages.some((sm: Message) => sm.name === dm.name)
       );
       
+      // Always include forum invite at the top if it exists
+      const forumInvite = defaultMessages.find(dm => dm.isForumInvite);
+      const otherDefaultMessages = defaultMessagesFiltered.filter(dm => !dm.isForumInvite);
+      
       const combinedMessages = [
+        ...(forumInvite ? [forumInvite] : []),
         ...sosMessages,
         ...nonSOSMessages,
-        ...defaultMessagesFiltered
+        ...otherDefaultMessages
       ];
       
       setMessages(combinedMessages);
@@ -376,14 +410,20 @@ const DMPage: React.FC = () => {
           {selectedTab === 'messages' && messages.map((msg) => (
             <div
               key={msg.id}
+              onClick={() => {
+                if (msg.isForumInvite) {
+                  setShowForumPreview(msg);
+                }
+              }}
               style={{
                 padding: '12px 16px',
                 borderBottom: '1px solid #262626',
                 cursor: 'pointer',
-                backgroundColor: msg.unread ? '#1a1a1a' : 'transparent',
+                backgroundColor: msg.unread || msg.isForumInvite ? '#1a1a1a' : 'transparent',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px'
+                gap: '12px',
+                borderLeft: msg.isForumInvite ? '3px solid #ff9500' : 'none'
               }}
             >
               <div style={{ position: 'relative' }}>
@@ -400,10 +440,12 @@ const DMPage: React.FC = () => {
                   fontWeight: 'bold',
                   background: msg.isSOS 
                     ? 'linear-gradient(135deg, #ff3040 0%, #ff6b6b 100%)'
+                    : msg.isForumInvite
+                    ? 'linear-gradient(135deg, #ff9500 0%, #ff6b6b 100%)'
                     : `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`,
-                  border: msg.isSOS ? '2px solid #ff3040' : 'none'
+                  border: msg.isSOS ? '2px solid #ff3040' : msg.isForumInvite ? '2px solid #ff9500' : 'none'
                 }}>
-                  {msg.isSOS ? '🚨' : msg.name.charAt(0)}
+                  {msg.isSOS ? '🚨' : msg.isForumInvite ? '🔥' : msg.name.charAt(0)}
                 </div>
                 {msg.isActive && !msg.isSOS && (
                   <div style={{
@@ -445,18 +487,19 @@ const DMPage: React.FC = () => {
                   marginBottom: '4px'
                 }}>
                   <span style={{
-                    color: msg.isSOS ? '#ff3040' : '#fff',
-                    fontWeight: msg.unread || msg.isSOS ? '600' : '400',
+                    color: msg.isSOS ? '#ff3040' : msg.isForumInvite ? '#ff9500' : '#fff',
+                    fontWeight: msg.unread || msg.isSOS || msg.isForumInvite ? '600' : '400',
                     fontSize: '14px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px'
                   }}>
                     {msg.isSOS && <span>🚨</span>}
+                    {msg.isForumInvite && <span>🔥</span>}
                     {msg.name}
                   </span>
                   {msg.time && (
-                    <span style={{ color: msg.isSOS ? '#ff3040' : '#8e8e8e', fontSize: '12px', fontWeight: msg.isSOS ? '600' : '400' }}>
+                    <span style={{ color: msg.isSOS ? '#ff3040' : msg.isForumInvite ? '#ff9500' : '#8e8e8e', fontSize: '12px', fontWeight: msg.isSOS || msg.isForumInvite ? '600' : '400' }}>
                       {msg.time}
                     </span>
                   )}
@@ -465,20 +508,20 @@ const DMPage: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
-                  backgroundColor: msg.isSOS ? 'rgba(255, 48, 64, 0.1)' : 'transparent',
-                  padding: msg.isSOS ? '4px 8px' : '0',
-                  borderRadius: msg.isSOS ? '6px' : '0',
-                  border: msg.isSOS ? '1px solid rgba(255, 48, 64, 0.3)' : 'none'
+                  backgroundColor: msg.isSOS ? 'rgba(255, 48, 64, 0.1)' : msg.isForumInvite ? 'rgba(255, 149, 0, 0.1)' : 'transparent',
+                  padding: msg.isSOS || msg.isForumInvite ? '4px 8px' : '0',
+                  borderRadius: msg.isSOS || msg.isForumInvite ? '6px' : '0',
+                  border: msg.isSOS ? '1px solid rgba(255, 48, 64, 0.3)' : msg.isForumInvite ? '1px solid rgba(255, 149, 0, 0.3)' : 'none'
                 }}>
                   <p style={{
-                    color: msg.isSOS ? '#ff3040' : (msg.unread ? '#fff' : '#8e8e8e'),
+                    color: msg.isSOS ? '#ff3040' : msg.isForumInvite ? '#ff9500' : (msg.unread ? '#fff' : '#8e8e8e'),
                     margin: 0,
                     fontSize: '14px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                     flex: 1,
-                    fontWeight: msg.isSOS ? '600' : '400'
+                    fontWeight: msg.isSOS || msg.isForumInvite ? '600' : '400'
                   }}>
                     {msg.lastMessage}
                   </p>
@@ -519,6 +562,167 @@ const DMPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Forum Preview Modal */}
+      {showForumPreview && (
+        <div
+          onClick={() => setShowForumPreview(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#1a1a1a',
+              borderRadius: '16px',
+              padding: '24px',
+              maxWidth: '500px',
+              width: '90%',
+              maxHeight: '80vh',
+              overflow: 'auto',
+              border: '2px solid #ff9500',
+              cursor: 'default',
+              boxShadow: '0 8px 32px rgba(255, 149, 0, 0.3)'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '20px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid #333'
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #ff9500 0%, #ff6b6b 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+                border: '2px solid #ff9500'
+              }}>
+                🔥
+              </div>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#ff9500' }}>
+                  {showForumPreview.name}
+                </h2>
+                <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#8e8e8e' }}>
+                  Community forum invitation
+                </p>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: '#e0e0e0', lineHeight: '1.6' }}>
+                Join the community discussion about the current wildfire situation. Share information, find aid, and stay updated with shelter availability.
+              </p>
+              
+              <div style={{
+                backgroundColor: '#0f0f0f',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '16px',
+                border: '1px solid #333'
+              }}>
+                <div style={{ fontSize: '12px', fontWeight: '600', color: '#8e8e8e', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Preview Messages
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '300px', overflowY: 'auto' }}>
+                  {showForumPreview.forumPreview?.map((forumMsg) => (
+                    <div key={forumMsg.id} style={{
+                      padding: '12px',
+                      backgroundColor: '#1a1a1a',
+                      borderRadius: '8px',
+                      border: '1px solid #262626'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>
+                          {forumMsg.author}
+                        </span>
+                        <span style={{ fontSize: '11px', color: '#8e8e8e' }}>
+                          {forumMsg.time}
+                        </span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '13px', color: '#e0e0e0', lineHeight: '1.5' }}>
+                        {forumMsg.message}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => {
+                  setShowForumPreview(null);
+                  // Handle accept - you can add logic here to join the forum
+                }}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  backgroundColor: '#ff9500',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#e68900';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ff9500';
+                }}
+              >
+                Accept & Join
+              </button>
+              <button
+                onClick={() => setShowForumPreview(null)}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  backgroundColor: 'transparent',
+                  color: '#8e8e8e',
+                  border: '1px solid #333',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#262626';
+                  e.currentTarget.style.color = '#fff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#8e8e8e';
+                }}
+              >
+                Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Right Panel - Empty Message State */}
       <div style={{
