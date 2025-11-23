@@ -12,7 +12,8 @@ import {
   HiOutlineHome, 
   HiOutlineSearch,
   HiOutlineFilm,
-  HiOutlineHeart
+  HiOutlineHeart,
+  HiOutlinePaperAirplane
 } from 'react-icons/hi';
 import { 
   MdOutlineAddBox,
@@ -54,15 +55,15 @@ const DMPage: React.FC = () => {
   ];
 
   const defaultMessages: Message[] = [
-    { id: 1, name: 'Steve', lastMessage: 'Hey, how are you doing?', time: '18m', unread: true },
-    { id: 2, name: 'John', lastMessage: 'Can we meet tomorrow?', time: '59m', unread: true },
-    { id: 3, name: 'Sarah', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
-    { id: 4, name: 'Mike', lastMessage: 'See you later', time: '3h', unread: false, isActive: true },
-    { id: 5, name: 'Emily', lastMessage: 'That sounds great', time: '5h', unread: false },
-    { id: 6, name: 'David', lastMessage: 'You: Sure, no problem', time: '17h', unread: false },
-    { id: 7, name: 'Lisa', lastMessage: 'Active 1m ago', time: '', unread: false, isActive: true, activeTime: '1m ago' },
-    { id: 8, name: 'Tom', lastMessage: 'You: Let me know when you\'re ready', time: '1d', unread: false },
-    { id: 9, name: 'Anna', lastMessage: 'Active now', time: '', unread: false, isActive: true, activeTime: 'now' },
+    { id: 1, name: 'God Usopp', lastMessage: 'I\'m not lying!', time: '18m', unread: true },
+    { id: 2, name: 'Itachi Uchiha', lastMessage: 'brb got some biz with the clan', time: '59m', unread: true },
+    { id: 3, name: 'Levi Ackerman', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
+    { id: 4, name: 'Eren Yeager', lastMessage: 'See you later', time: '3h', unread: false, isActive: true },
+    { id: 5, name: 'Light Yagami', lastMessage: 'That sounds great', time: '5h', unread: false },
+    { id: 6, name: 'Ichigo Kurosaki', lastMessage: 'You: Sure, no problem', time: '17h', unread: false },
+    { id: 7, name: 'Tanjiro Kamado', lastMessage: 'Active 1m ago', time: '', unread: false, isActive: true, activeTime: '1m ago' },
+    { id: 8, name: 'Kakashi Hatake', lastMessage: 'You: Let me know when you\'re ready', time: '1d', unread: false },
+    { id: 9, name: 'Vegeta', lastMessage: 'Active now', time: '', unread: false, isActive: true, activeTime: 'now' },
   ];
 
   useEffect(() => {
@@ -155,6 +156,25 @@ const DMPage: React.FC = () => {
         <HiOutlineHome size={24} style={{ cursor: 'pointer' }} onClick={() => navigate('/home')} />
         <HiOutlineSearch size={24} style={{ cursor: 'pointer' }} />
         <HiOutlineFilm size={24} style={{ cursor: 'pointer' }} />
+        <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => navigate('/dm')}>
+          <HiOutlinePaperAirplane size={24} style={{ transform: 'rotate(45deg)', opacity: 1 }} />
+          <div style={{
+            position: 'absolute',
+            top: '-4px',
+            right: '-4px',
+            width: '18px',
+            height: '18px',
+            borderRadius: '50%',
+            backgroundColor: '#ed4956',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '10px',
+            fontWeight: '600'
+          }}>
+            4
+          </div>
+        </div>
         <div style={{ position: 'relative', cursor: 'pointer' }}>
           <HiOutlineHeart size={24} />
           <div style={{
@@ -171,7 +191,7 @@ const DMPage: React.FC = () => {
             fontSize: '10px',
             fontWeight: '600'
           }}>
-            3
+            4
           </div>
         </div>
         <MdOutlineAddBox size={24} style={{ cursor: 'pointer' }} />
@@ -182,8 +202,15 @@ const DMPage: React.FC = () => {
           backgroundColor: '#262626',
           cursor: 'pointer'
         }} />
-        <MdOutlineMenu size={24} style={{ cursor: 'pointer' }} />
-        <BsGrid3X3 size={20} style={{ cursor: 'pointer' }} />
+        <MdOutlineMenu size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} 
+          onClick={() => navigate('/settings')}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
+        <BsGrid3X3 size={20} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
       </div>
 
       {/* Central Panel - Messages */}
@@ -203,7 +230,7 @@ const DMPage: React.FC = () => {
           alignItems: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px', fontWeight: '600' }}>imtiaz._.n</span>
+            <span style={{ fontSize: '16px', fontWeight: '600' }}>jordan_smith</span>
             <FiChevronRight size={16} style={{ color: '#8e8e8e' }} />
           </div>
           <FiEdit3 size={20} style={{ cursor: 'pointer' }} />

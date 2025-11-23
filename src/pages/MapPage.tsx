@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import MapController from '../components/MapController';
 import MapRefSetter from '../components/MapRefSetter';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag, FiShare2, FiUsers, FiUser, FiGlobe, FiX, FiAlertTriangle } from 'react-icons/fi';
+import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag, FiShare2, FiUsers, FiUser, FiGlobe, FiX, FiAlertTriangle, FiChevronLeft } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -251,7 +251,7 @@ interface Business {
   position: [number, number];
 }
 
-const KelownaMapPage: React.FC = () => {
+const MapPage: React.FC = () => {
   const navigate = useNavigate();
   const [mapMode, setMapMode] = useState<'map' | 'sos'>('map');
   const [sosTab, setSosTab] = useState<'emergency' | 'aid'>('emergency');
@@ -267,7 +267,7 @@ const KelownaMapPage: React.FC = () => {
   const [showSOSConfirmation, setShowSOSConfirmation] = useState<boolean>(false);
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
   
-  const closeFriends = ['Steve', 'John', 'Sarah', 'Mike', 'Emily'];
+  const closeFriends = ['Monkey D. Luffy', 'Son Goku', 'Naruto Uzumaki', 'Roronoa Zoro', 'Satoru Gojo'];
   
   
   const alertFireZone: [number, number][] = [
@@ -336,6 +336,13 @@ const KelownaMapPage: React.FC = () => {
       position: [49.8700, -119.4800], 
       date: '2024-09-10',
       image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop'
+    },
+    { 
+      id: 4, 
+      title: 'Sunset View', 
+      position: [49.8500, -119.6000], 
+      date: '2024-06-25',
+      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop'
     },
   ];
 
@@ -649,6 +656,17 @@ const KelownaMapPage: React.FC = () => {
           animation: none !important;
           transform: scale(1.1) !important;
         }
+        .leaflet-top.leaflet-left {
+          top: auto !important;
+          bottom: 20px !important;
+          right: 20px !important;
+          left: auto !important;
+        }
+        .leaflet-control-zoom {
+          margin: 0 !important;
+          display: block !important;
+          visibility: visible !important;
+        }
       `}</style>
       <div style={{
         position: 'absolute',
@@ -674,13 +692,58 @@ const KelownaMapPage: React.FC = () => {
             Kelowna Map
           </h1>
         </div>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', position: 'relative' }}>
+      </div>
+
+      {/* Back Button - Top Left of Map */}
+      <Link
+        to="/dm"
+        style={{
+          position: 'absolute',
+          top: '90px',
+          left: '20px',
+          zIndex: 1000,
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#fff',
+          textDecoration: 'none',
+          cursor: 'pointer',
+          transition: 'background-color 0.2s',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+        }}
+        onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        }}
+        onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+        }}
+      >
+        <FiChevronLeft size={24} />
+      </Link>
+
+      {/* Share Location Button - Top Middle of Map */}
+      <div style={{
+        position: 'absolute',
+        top: '90px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <div style={{ position: 'relative' }}>
           <button
             data-sharing-button
             onClick={() => setShowSharingOptions(!showSharingOptions)}
             style={{
               padding: '8px 16px',
-              backgroundColor: isSharingLocation ? '#22c55e' : '#262626',
+              backgroundColor: isSharingLocation ? '#22c55e' : 'rgba(0, 0, 0, 0.85)',
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
@@ -689,16 +752,18 @@ const KelownaMapPage: React.FC = () => {
               alignItems: 'center',
               gap: '8px',
               cursor: 'pointer',
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
             }}
             onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
               if (!isSharingLocation) {
-                e.currentTarget.style.backgroundColor = '#333';
+                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
               }
             }}
             onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
               if (!isSharingLocation) {
-                e.currentTarget.style.backgroundColor = '#262626';
+                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
               }
             }}
           >
@@ -712,7 +777,8 @@ const KelownaMapPage: React.FC = () => {
               style={{
                 position: 'absolute',
                 top: '100%',
-                right: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
                 marginTop: '8px',
                 backgroundColor: '#1a1a1a',
                 borderRadius: '12px',
@@ -933,37 +999,6 @@ const KelownaMapPage: React.FC = () => {
               </div>
             </div>
           )}
-          
-          <Link 
-            to="/dm" 
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#262626',
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <FiNavigation size={16} />
-            DM Page
-          </Link>
-          <Link 
-            to="/settings" 
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#262626',
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontSize: '14px'
-            }}
-          >
-            Settings
-          </Link>
         </div>
       </div>
 
@@ -971,6 +1006,7 @@ const KelownaMapPage: React.FC = () => {
         key={`map-${mapMode}-${selectedFilters.size}`}
         center={kelownaPosition}
         zoom={12}
+        zoomControl={true}
         style={{ 
           height: 'calc(100% - 72px)', 
           width: '100%', 
@@ -997,53 +1033,77 @@ const KelownaMapPage: React.FC = () => {
         {/* Fire Zones - Only show in SOS mode */}
         {mapMode === 'sos' && (
           <>
+            {/* Orange zone - Wildfire information area (rendered first, so it's below) */}
             <Polygon
               positions={alertFireZone}
               pathOptions={{
-                color: '#ff3040',
-                fillColor: '#ff3040',
+                color: '#ff9500',
+                fillColor: '#ff9500',
                 fillOpacity: 0.3,
                 weight: 2
               }}
             >
               <Popup>
-                <div>
-                  <strong>Fire Alert Zone</strong>
-                  <p>High risk area - evacuation may be required</p>
+                <div style={{ minWidth: '200px' }}>
+                  <strong style={{ fontSize: '16px', color: '#ff9500', display: 'block', marginBottom: '8px' }}>
+                    Moderate Fire Zone
+                  </strong>
+                  <p style={{ margin: '4px 0', fontSize: '14px', lineHeight: '1.5' }}>
+                    This area is experiencing moderate fire activity. Active wildfires have been detected, and conditions may change rapidly.
+                  </p>
+                  <p style={{ margin: '4px 0', fontSize: '13px', color: '#666', fontStyle: 'italic' }}>
+                    Stay informed and be prepared to evacuate if conditions worsen.
+                  </p>
                 </div>
               </Popup>
             </Polygon>
             
+            {/* Red zones - High level fire danger (rendered after, so they're on top) */}
             <Polygon
               positions={orderFireZone1}
               pathOptions={{
-                color: '#ff9500',
-                fillColor: '#ff9500',
-                fillOpacity: 0.25,
+                color: '#ff3040',
+                fillColor: '#ff3040',
+                fillOpacity: 0.35,
                 weight: 2
               }}
             >
               <Popup>
-                <div>
-                  <strong>Evacuation Order Zone 1</strong>
-                  <p>Evacuation order in effect</p>
+                <div style={{ minWidth: '200px' }}>
+                  <strong style={{ fontSize: '16px', color: '#ff3040', display: 'block', marginBottom: '8px' }}>
+                    High Level Fire Danger Zone
+                  </strong>
+                  <p style={{ margin: '4px 0', fontSize: '14px', lineHeight: '1.5' }}>
+                    This area is under high level fire danger. Active, spreading wildfires pose significant risk to life and property.
+                  </p>
+                  <p style={{ margin: '4px 0', fontSize: '13px', color: '#ff3040', fontWeight: '600' }}>
+                    Immediate evacuation is strongly recommended. Follow emergency services instructions.
+                  </p>
                 </div>
               </Popup>
             </Polygon>
             
+            {/* Overlap zone - Extreme fire danger (where both red zones overlap, rendered last so it's on top) */}
             <Polygon
               positions={orderFireZone2}
               pathOptions={{
-                color: '#ff9500',
-                fillColor: '#ff9500',
-                fillOpacity: 0.25,
-                weight: 2
+                color: '#cc0000',
+                fillColor: '#cc0000',
+                fillOpacity: 0.5,
+                weight: 3
               }}
             >
               <Popup>
-                <div>
-                  <strong>Evacuation Order Zone 2</strong>
-                  <p>Evacuation order in effect</p>
+                <div style={{ minWidth: '220px' }}>
+                  <strong style={{ fontSize: '17px', color: '#cc0000', display: 'block', marginBottom: '8px' }}>
+                    ⚠️ Extreme Level Fire Danger Zone
+                  </strong>
+                  <p style={{ margin: '4px 0', fontSize: '14px', lineHeight: '1.5', fontWeight: '600' }}>
+                    This area is experiencing extreme fire conditions with multiple overlapping high-risk zones. The convergence of fire activity creates an exceptionally dangerous situation.
+                  </p>
+                  <p style={{ margin: '4px 0', fontSize: '13px', color: '#cc0000', fontWeight: '700', backgroundColor: '#ffe6e6', padding: '6px', borderRadius: '4px' }}>
+                    🚨 EVACUATE IMMEDIATELY. Do not delay. This is the highest risk area.
+                  </p>
                 </div>
               </Popup>
             </Polygon>
@@ -1262,53 +1322,6 @@ const KelownaMapPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Info Panel */}
-      {mapMode === 'map' && (
-        <div style={{
-          position: 'absolute',
-          bottom: '90px',
-          left: '20px',
-          zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          padding: '16px',
-          borderRadius: '16px',
-          color: '#fff',
-          maxWidth: '300px',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          transition: 'opacity 0.3s ease'
-        }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '600' }}>Kelowna, BC</h3>
-          <p style={{ margin: '0 0 12px 0', color: '#a8a8a8', fontSize: '14px', lineHeight: '1.4' }}>
-            Explore the map to find shelters and view your memories.
-          </p>
-          <div style={{ 
-            display: 'flex', 
-            gap: '8px', 
-            flexWrap: 'wrap',
-            marginTop: '12px'
-          }}>
-            {memories.map((memory) => (
-              <span 
-                key={memory.id}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: 'rgba(255, 48, 64, 0.2)',
-                  borderRadius: '12px',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  border: '1px solid rgba(255, 48, 64, 0.3)'
-                }}
-              >
-                <FiHeart size={12} color="#ff3040" />
-                {memory.title}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
 
       {mapMode === 'sos' && (
         <div style={{
@@ -2283,5 +2296,5 @@ const KelownaMapPage: React.FC = () => {
   );
 };
 
-export default KelownaMapPage;
+export default MapPage;
 

@@ -127,7 +127,7 @@ const createMemoryIcon = (memory: Memory, index: number): L.DivIcon => {
   });
 };
 
-interface RegularMapProps {
+interface ShelterfindrProps {
   kelownaPosition: [number, number];
   memories: Memory[];
   locations: Location[];
@@ -135,7 +135,7 @@ interface RegularMapProps {
   onMemorySelect: (memory: Memory | null) => void;
 }
 
-const RegularMap: React.FC<RegularMapProps> = ({
+const Shelterfindr: React.FC<ShelterfindrProps> = ({
   kelownaPosition,
   memories,
   locations,
@@ -403,5 +403,5 @@ const RegularMap: React.FC<RegularMapProps> = ({
   );
 };
 
-export default RegularMap;
+export default Shelterfindr;
 
