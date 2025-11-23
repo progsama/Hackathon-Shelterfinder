@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Link } from 'react-router-dom';
-import { FiMapPin, FiNavigation } from 'react-icons/fi';
+import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -18,7 +19,16 @@ interface Location {
   type: string;
 }
 
+interface Memory {
+  id: number;
+  title: string;
+  position: [number, number];
+  date: string;
+  image?: string;
+}
+
 const KelownaMapPage: React.FC = () => {
+  const [mapMode, setMapMode] = useState<'map' | 'sos'>('map');
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
 
   const locations: Location[] = [
@@ -26,6 +36,19 @@ const KelownaMapPage: React.FC = () => {
     { id: 2, name: 'Rutland Area', position: [49.9000, -119.4000], type: 'Shelter' },
     { id: 3, name: 'West Kelowna', position: [49.8500, -119.6000], type: 'Shelter' },
     { id: 4, name: 'Mission Area', position: [49.8700, -119.4800], type: 'Shelter' },
+  ];
+
+  const memories: Memory[] = [
+    { id: 1, title: 'Summer Picnic', position: [49.8880, -119.4960], date: '2024-07-15' },
+    { id: 2, title: 'Hiking Adventure', position: [49.9000, -119.4000], date: '2024-08-20' },
+    { id: 3, title: 'Beach Day', position: [49.8700, -119.4800], date: '2024-09-10' },
+  ];
+
+  const sosLocations: Location[] = [
+    { id: 1, name: 'Emergency Shelter', position: [49.8880, -119.4960], type: 'Emergency' },
+    { id: 2, name: 'Hospital', position: [49.9000, -119.4000], type: 'Medical' },
+    { id: 3, name: 'Police Station', position: [49.8500, -119.6000], type: 'Safety' },
+    { id: 4, name: 'Fire Station', position: [49.8700, -119.4800], type: 'Emergency' },
   ];
 
   return (
@@ -107,55 +130,227 @@ const KelownaMapPage: React.FC = () => {
           </Popup>
         </Marker>
 
-        {locations.map((location) => (
-          <Marker key={location.id} position={location.position}>
-            <Popup>
-              <div>
-                <strong>{location.name}</strong>
-                <p>Type: {location.type}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {mapMode === 'map' ? (
+          <>
+            {locations.map((location) => (
+              <Marker key={location.id} position={location.position}>
+                <Popup>
+                  <div>
+                    <strong>{location.name}</strong>
+                    <p>Type: {location.type}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+            {memories.map((memory) => (
+              <Marker key={`memory-${memory.id}`} position={memory.position}>
+                <Popup>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <FiHeart size={16} color="#ff3040" />
+                      <strong>{memory.title}</strong>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>{memory.date}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </>
+        ) : (
+          <>
+            {sosLocations.map((location) => (
+              <Marker key={`sos-${location.id}`} position={location.position}>
+                <Popup>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <FiAlertCircle size={16} color="#ff3040" />
+                      <strong>{location.name}</strong>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>Type: {location.type}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </>
+        )}
       </MapContainer>
 
+      {/* Instagram-style Toggle Button */}
       <div style={{
         position: 'absolute',
-        bottom: '20px',
-        left: '20px',
+        bottom: '24px',
+        left: '50%',
+        transform: 'translateX(-50%)',
         zIndex: 1000,
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        padding: '16px',
-        borderRadius: '12px',
-        color: '#fff',
-        maxWidth: '300px',
-        backdropFilter: 'blur(10px)'
+        display: 'flex',
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        padding: '4px',
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
+        border: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
-        <h3 style={{ margin: '0 0 8px 0', fontSize: '18px' }}>Kelowna, BC</h3>
-        <p style={{ margin: '0 0 8px 0', color: '#8e8e8e', fontSize: '14px' }}>
-          Explore the map to find shelters and important locations in Kelowna.
-        </p>
-        <div style={{ 
-          display: 'flex', 
-          gap: '8px', 
-          flexWrap: 'wrap',
-          marginTop: '12px'
-        }}>
-          {locations.map((loc) => (
-            <span 
-              key={loc.id}
-              style={{
-                padding: '4px 8px',
-                backgroundColor: '#0095f6',
-                borderRadius: '4px',
-                fontSize: '12px'
-              }}
-            >
-              {loc.name}
-            </span>
-          ))}
-        </div>
+        <button
+          onClick={() => setMapMode('map')}
+          style={{
+            padding: '10px 24px',
+            borderRadius: '20px',
+            border: 'none',
+            backgroundColor: mapMode === 'map' ? '#fff' : 'transparent',
+            color: mapMode === 'map' ? '#000' : '#fff',
+            fontSize: '15px',
+            fontWeight: mapMode === 'map' ? '600' : '400',
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            outline: 'none',
+            whiteSpace: 'nowrap'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            if (mapMode !== 'map') {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            }
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            if (mapMode !== 'map') {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          <FiMapPin size={16} />
+          Map
+        </button>
+        <button
+          onClick={() => setMapMode('sos')}
+          style={{
+            padding: '10px 24px',
+            borderRadius: '20px',
+            border: 'none',
+            backgroundColor: mapMode === 'sos' ? '#fff' : 'transparent',
+            color: mapMode === 'sos' ? '#000' : '#fff',
+            fontSize: '15px',
+            fontWeight: mapMode === 'sos' ? '600' : '400',
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            outline: 'none',
+            whiteSpace: 'nowrap'
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            if (mapMode !== 'sos') {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            }
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            if (mapMode !== 'sos') {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          <FiAlertCircle size={16} />
+          SOS
+        </button>
       </div>
+
+      {/* Info Panel */}
+      {mapMode === 'map' && (
+        <div style={{
+          position: 'absolute',
+          bottom: '90px',
+          left: '20px',
+          zIndex: 1000,
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          padding: '16px',
+          borderRadius: '16px',
+          color: '#fff',
+          maxWidth: '300px',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          transition: 'opacity 0.3s ease'
+        }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '600' }}>Kelowna, BC</h3>
+          <p style={{ margin: '0 0 12px 0', color: '#a8a8a8', fontSize: '14px', lineHeight: '1.4' }}>
+            Explore the map to find shelters and view your memories.
+          </p>
+          <div style={{ 
+            display: 'flex', 
+            gap: '8px', 
+            flexWrap: 'wrap',
+            marginTop: '12px'
+          }}>
+            {memories.map((memory) => (
+              <span 
+                key={memory.id}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: 'rgba(255, 48, 64, 0.2)',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  border: '1px solid rgba(255, 48, 64, 0.3)'
+                }}
+              >
+                <FiHeart size={12} color="#ff3040" />
+                {memory.title}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {mapMode === 'sos' && (
+        <div style={{
+          position: 'absolute',
+          bottom: '90px',
+          left: '20px',
+          zIndex: 1000,
+          backgroundColor: 'rgba(255, 48, 64, 0.15)',
+          padding: '16px',
+          borderRadius: '16px',
+          color: '#fff',
+          maxWidth: '300px',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 48, 64, 0.3)',
+          transition: 'opacity 0.3s ease'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <FiAlertCircle size={20} color="#ff3040" />
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>Emergency Services</h3>
+          </div>
+          <p style={{ margin: '0 0 12px 0', color: '#ffb3b8', fontSize: '14px', lineHeight: '1.4' }}>
+            Find emergency services, hospitals, and safety locations near you.
+          </p>
+          <div style={{ 
+            display: 'flex', 
+            gap: '8px', 
+            flexWrap: 'wrap',
+            marginTop: '12px'
+          }}>
+            {sosLocations.map((loc) => (
+              <span 
+                key={loc.id}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: 'rgba(255, 48, 64, 0.3)',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                  border: '1px solid rgba(255, 48, 64, 0.5)'
+                }}
+              >
+                {loc.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
