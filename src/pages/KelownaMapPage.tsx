@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import MapController from '../components/MapController';
 import MapRefSetter from '../components/MapRefSetter';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag } from 'react-icons/fi';
+import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag, FiShare2, FiUsers, FiUser, FiGlobe, FiX, FiAlertTriangle } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -261,7 +261,13 @@ const KelownaMapPage: React.FC = () => {
   const [selectedService, setSelectedService] = useState<EmergencyService | null>(null);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [mapRef, setMapRef] = useState<L.Map | null>(null);
+  const [isSharingLocation, setIsSharingLocation] = useState<boolean>(false);
+  const [sharingMode, setSharingMode] = useState<'public' | 'close-friends' | 'individuals' | 'disabled'>('disabled');
+  const [showSharingOptions, setShowSharingOptions] = useState<boolean>(false);
+  const [showSOSConfirmation, setShowSOSConfirmation] = useState<boolean>(false);
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
+  
+  const closeFriends = ['Steve', 'John', 'Sarah', 'Mike', 'Emily'];
   
   
   const alertFireZone: [number, number][] = [
@@ -509,6 +515,65 @@ const KelownaMapPage: React.FC = () => {
     window.open(url, '_blank');
   };
 
+  const handleSendSOS = () => {
+    let userLocation: [number, number] = kelownaPosition;
+    let locationText = 'Kelowna, BC';
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          userLocation = [position.coords.latitude, position.coords.longitude];
+          locationText = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
+          sendSOSToCloseFriends(userLocation, locationText);
+        },
+        () => {
+          sendSOSToCloseFriends(userLocation, locationText);
+        }
+      );
+    } else {
+      sendSOSToCloseFriends(userLocation, locationText);
+    }
+  };
+
+  const sendSOSToCloseFriends = (location: [number, number], locationText: string) => {
+    const sosTimestamp = Date.now();
+    const sosMessages = closeFriends.map((friend, index) => ({
+      id: sosTimestamp + index,
+      name: friend,
+      lastMessage: `🚨 SOS Alert: I need help! My location: ${locationText}`,
+      time: 'now',
+      unread: true,
+      isSOS: true,
+      location: location,
+      timestamp: new Date().toISOString(),
+      locationText: locationText,
+      sosSentAt: sosTimestamp
+    }));
+
+    const existingMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+    const nonSOSMessages = existingMessages.filter((m: any) => !m.isSOS);
+    const updatedMessages = [...sosMessages, ...nonSOSMessages];
+    localStorage.setItem('dmMessages', JSON.stringify(updatedMessages));
+    localStorage.setItem('sosActive', 'true');
+    localStorage.setItem('lastSOSTimestamp', sosTimestamp.toString());
+    
+    setShowSharingOptions(false);
+    
+    const event = new CustomEvent('sosSent', { 
+      detail: { 
+        timestamp: sosTimestamp,
+        messages: sosMessages 
+      } 
+    });
+    
+    window.dispatchEvent(event);
+    
+    setShowSOSConfirmation(true);
+    setTimeout(() => {
+      setShowSOSConfirmation(false);
+    }, 3000);
+  };
+
   useEffect(() => {
     if (mapRef) {
       setTimeout(() => {
@@ -516,6 +581,28 @@ const KelownaMapPage: React.FC = () => {
       }, 100);
     }
   }, [selectedFilters, mapRef]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const dropdown = document.querySelector('[data-sharing-dropdown]');
+      const button = document.querySelector('[data-sharing-button]');
+      
+      if (showSharingOptions && dropdown && button) {
+        if (!dropdown.contains(target) && !button.contains(target)) {
+          setShowSharingOptions(false);
+        }
+      }
+    };
+
+    if (showSharingOptions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSharingOptions]);
 
   const handleGetDirectionsShelter = (shelter: Shelter) => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${shelter.position[0]},${shelter.position[1]}`;
@@ -591,7 +678,266 @@ const KelownaMapPage: React.FC = () => {
             Kelowna Map
           </h1>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', position: 'relative' }}>
+          <button
+            data-sharing-button
+            onClick={() => setShowSharingOptions(!showSharingOptions)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: isSharingLocation ? '#22c55e' : '#262626',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              if (!isSharingLocation) {
+                e.currentTarget.style.backgroundColor = '#333';
+              }
+            }}
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              if (!isSharingLocation) {
+                e.currentTarget.style.backgroundColor = '#262626';
+              }
+            }}
+          >
+            <FiShare2 size={16} />
+            {isSharingLocation ? 'Sharing Location' : 'Share Location'}
+          </button>
+          
+          {showSharingOptions && (
+            <div
+              data-sharing-dropdown
+              style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '8px',
+                backgroundColor: '#1a1a1a',
+                borderRadius: '12px',
+                padding: '8px',
+                minWidth: '220px',
+                boxShadow: '0 4px 24px rgba(0, 0, 0, 0.5)',
+                border: '1px solid #333',
+                zIndex: 2000
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ padding: '8px 12px', borderBottom: '1px solid #333', marginBottom: '4px' }}>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#fff', marginBottom: '4px' }}>
+                  Share Location With
+                </div>
+                <div style={{ fontSize: '11px', color: '#8e8e8e' }}>
+                  {isSharingLocation ? `Currently sharing with: ${sharingMode === 'public' ? 'Public' : sharingMode === 'close-friends' ? 'Close Friends' : 'Individuals'}` : 'Location sharing is disabled'}
+                </div>
+              </div>
+              
+              <button
+                onClick={() => {
+                  setSharingMode('public');
+                  setIsSharingLocation(true);
+                  setShowSharingOptions(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: sharingMode === 'public' ? 'rgba(34, 197, 94, 0.2)' : 'transparent',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  marginBottom: '4px'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  if (sharingMode !== 'public') {
+                    e.currentTarget.style.backgroundColor = '#262626';
+                  }
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  if (sharingMode !== 'public') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <FiGlobe size={18} color={sharingMode === 'public' ? '#22c55e' : '#8e8e8e'} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: sharingMode === 'public' ? '600' : '400' }}>Public</div>
+                  <div style={{ fontSize: '11px', color: '#8e8e8e', marginTop: '2px' }}>Everyone can see your location</div>
+                </div>
+                {sharingMode === 'public' && <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />}
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSharingMode('close-friends');
+                  setIsSharingLocation(true);
+                  setShowSharingOptions(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: sharingMode === 'close-friends' ? 'rgba(34, 197, 94, 0.2)' : 'transparent',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  marginBottom: '4px'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  if (sharingMode !== 'close-friends') {
+                    e.currentTarget.style.backgroundColor = '#262626';
+                  }
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  if (sharingMode !== 'close-friends') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <FiUsers size={18} color={sharingMode === 'close-friends' ? '#22c55e' : '#8e8e8e'} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: sharingMode === 'close-friends' ? '600' : '400' }}>Close Friends</div>
+                  <div style={{ fontSize: '11px', color: '#8e8e8e', marginTop: '2px' }}>Only your close friends list</div>
+                </div>
+                {sharingMode === 'close-friends' && <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />}
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSharingMode('individuals');
+                  setIsSharingLocation(true);
+                  setShowSharingOptions(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: sharingMode === 'individuals' ? 'rgba(34, 197, 94, 0.2)' : 'transparent',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  marginBottom: '4px'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  if (sharingMode !== 'individuals') {
+                    e.currentTarget.style.backgroundColor = '#262626';
+                  }
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  if (sharingMode !== 'individuals') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <FiUser size={18} color={sharingMode === 'individuals' ? '#22c55e' : '#8e8e8e'} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: sharingMode === 'individuals' ? '600' : '400' }}>Individuals</div>
+                  <div style={{ fontSize: '11px', color: '#8e8e8e', marginTop: '2px' }}>Select specific people</div>
+                </div>
+                {sharingMode === 'individuals' && <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />}
+              </button>
+              
+              <div style={{ borderTop: '1px solid #333', marginTop: '4px', paddingTop: '4px', marginBottom: '4px' }}>
+                <button
+                  onClick={handleSendSOS}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: 'rgba(255, 48, 64, 0.2)',
+                    color: '#fff',
+                    border: '1px solid rgba(255, 48, 64, 0.5)',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                    marginBottom: '8px'
+                  }}
+                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.3)';
+                  }}
+                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.2)';
+                  }}
+                >
+                  <FiAlertTriangle size={18} color="#ff3040" />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '600', color: '#ff3040' }}>Send SOS</div>
+                    <div style={{ fontSize: '11px', color: '#ffb3b8', marginTop: '2px' }}>Send emergency alert to close friends</div>
+                  </div>
+                </button>
+              </div>
+              
+              <div style={{ borderTop: '1px solid #333', marginTop: '4px', paddingTop: '4px' }}>
+                <button
+                  onClick={() => {
+                    setSharingMode('disabled');
+                    setIsSharingLocation(false);
+                    setShowSharingOptions(false);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: sharingMode === 'disabled' ? 'rgba(255, 48, 64, 0.2)' : 'transparent',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    if (sharingMode !== 'disabled') {
+                      e.currentTarget.style.backgroundColor = '#262626';
+                    }
+                  }}
+                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    if (sharingMode !== 'disabled') {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
+                >
+                  <FiX size={18} color={sharingMode === 'disabled' ? '#ff3040' : '#8e8e8e'} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: sharingMode === 'disabled' ? '600' : '400' }}>Disable Location</div>
+                    <div style={{ fontSize: '11px', color: '#8e8e8e', marginTop: '2px' }}>Stop sharing your location</div>
+                  </div>
+                  {sharingMode === 'disabled' && <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff3040' }} />}
+                </button>
+              </div>
+            </div>
+          )}
+          
           <Link 
             to="/dm" 
             style={{
@@ -1879,6 +2225,61 @@ const KelownaMapPage: React.FC = () => {
             }}>
               Location: {selectedMemory.position[0].toFixed(4)}, {selectedMemory.position[1].toFixed(4)}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* SOS Confirmation Popup */}
+      {showSOSConfirmation && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 3000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#1a1a1a',
+              borderRadius: '16px',
+              padding: '32px',
+              maxWidth: '400px',
+              width: '90%',
+              border: '2px solid #ff3040',
+              boxShadow: '0 8px 32px rgba(255, 48, 64, 0.3)',
+              textAlign: 'center',
+              pointerEvents: 'auto'
+            }}
+          >
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 48, 64, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px'
+            }}>
+              <FiAlertTriangle size={32} color="#ff3040" />
+            </div>
+            <h2 style={{ margin: '0 0 12px 0', fontSize: '24px', fontWeight: '600', color: '#fff' }}>
+              SOS Sent!
+            </h2>
+            <p style={{ margin: '0 0 8px 0', color: '#e0e0e0', fontSize: '16px', lineHeight: '1.5' }}>
+              Your SOS alert has been sent to your close friends.
+            </p>
+            <p style={{ margin: '0', color: '#8e8e8e', fontSize: '14px', lineHeight: '1.5' }}>
+              They will receive your location and can help you immediately.
+            </p>
           </div>
         </div>
       )}
