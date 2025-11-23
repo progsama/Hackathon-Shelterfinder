@@ -58,6 +58,7 @@ const DMPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'messages' | 'requests'>('messages');
   const [messages, setMessages] = useState<Message[]>([]);
   const [showForumPreview, setShowForumPreview] = useState<Message | null>(null);
+  const [hasSOSBeenSent, setHasSOSBeenSent] = useState<boolean>(false);
 
   const notes: Note[] = [
     { id: 1, text: 'Your note' },
@@ -113,8 +114,12 @@ const DMPage: React.FC = () => {
       const sosSentAfterLoad = localStorage.getItem('sosSentAfterLoad') === 'true';
       const lastSOSTimestamp = parseInt(localStorage.getItem('lastSOSTimestamp') || '0');
       
+      // Check if SOS has been sent
+      const sosSent = sosSentAfterLoad && lastSOSTimestamp > 0;
+      setHasSOSBeenSent(sosSent);
+      
       let sosMessages: Message[] = [];
-      if (sosSentAfterLoad && lastSOSTimestamp > 0) {
+      if (sosSent) {
         sosMessages = storedMessages.filter((m: Message) => 
           m.isSOS && 
           m.sosSentAt && 
@@ -234,8 +239,23 @@ const DMPage: React.FC = () => {
           height: '24px',
           borderRadius: '50%',
           backgroundColor: '#262626',
-          cursor: 'pointer'
-        }} />
+          cursor: 'pointer',
+          backgroundImage: 'url(https://i.pinimg.com/564x/3a/3f/8a/3a3f8a5e5e5e5e5e5e5e5e5e5e5e5e5e5.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          border: '1px solid #262626',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.opacity = '0.8';
+          e.currentTarget.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.opacity = '1';
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
+        />
         <MdOutlineMenu size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} 
           onClick={() => navigate('/settings')}
           onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
@@ -345,7 +365,7 @@ const DMPage: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: note.id === 1 ? '4px solid #ed4956' : '2px solid #fff'
+                    border: (note.id === 1 && hasSOSBeenSent) ? '4px solid #ed4956' : '2px solid #fff'
                   }}>
                     <span style={{ fontSize: '20px' }}>📝</span>
                   </div>
@@ -423,7 +443,18 @@ const DMPage: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                borderLeft: msg.isForumInvite ? '3px solid #ff9500' : 'none'
+                borderLeft: msg.isForumInvite ? '3px solid #ff9500' : 'none',
+                transition: 'background-color 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (!msg.unread && !msg.isForumInvite) {
+                  e.currentTarget.style.backgroundColor = '#0f0f0f';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!msg.unread && !msg.isForumInvite) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
               }}
             >
               <div style={{ position: 'relative' }}>
@@ -443,8 +474,24 @@ const DMPage: React.FC = () => {
                     : msg.isForumInvite
                     ? 'linear-gradient(135deg, #ff9500 0%, #ff6b6b 100%)'
                     : `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`,
-                  border: msg.isSOS ? '2px solid #ff3040' : msg.isForumInvite ? '2px solid #ff9500' : 'none'
-                }}>
+                  border: msg.isSOS ? '2px solid #ff3040' : msg.isForumInvite ? '2px solid #ff9500' : 'none',
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer',
+                  boxShadow: msg.isSOS || msg.isForumInvite ? '0 2px 8px rgba(255, 149, 0, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.2)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.1)';
+                  e.currentTarget.style.boxShadow = msg.isSOS || msg.isForumInvite 
+                    ? '0 4px 12px rgba(255, 149, 0, 0.5)' 
+                    : '0 4px 8px rgba(0, 0, 0, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = msg.isSOS || msg.isForumInvite 
+                    ? '0 2px 8px rgba(255, 149, 0, 0.3)' 
+                    : '0 2px 4px rgba(0, 0, 0, 0.2)';
+                }}
+                >
                   {msg.isSOS ? '🚨' : msg.isForumInvite ? '🔥' : msg.name.charAt(0)}
                 </div>
                 {msg.isActive && !msg.isSOS && (
