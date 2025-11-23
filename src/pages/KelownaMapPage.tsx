@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import MapController from '../components/MapController';
 import MapRefSetter from '../components/MapRefSetter';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag, FiShare2, FiUsers, FiUser, FiGlobe, FiX, FiAlertTriangle } from 'react-icons/fi';
+import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag, FiShare2, FiUsers, FiUser, FiGlobe, FiX, FiAlertTriangle, FiChevronLeft } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -656,6 +656,17 @@ const KelownaMapPage: React.FC = () => {
           animation: none !important;
           transform: scale(1.1) !important;
         }
+        .leaflet-top.leaflet-left {
+          top: auto !important;
+          bottom: 20px !important;
+          right: 20px !important;
+          left: auto !important;
+        }
+        .leaflet-control-zoom {
+          margin: 0 !important;
+          display: block !important;
+          visibility: visible !important;
+        }
       `}</style>
       <div style={{
         position: 'absolute',
@@ -683,23 +694,6 @@ const KelownaMapPage: React.FC = () => {
         </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <Link 
-            to="/dm" 
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#262626',
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <FiNavigation size={16} />
-            DM Page
-          </Link>
-          <Link 
             to="/settings" 
             style={{
               padding: '8px 16px',
@@ -714,6 +708,38 @@ const KelownaMapPage: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {/* Back Button - Top Left of Map */}
+      <Link
+        to="/dm"
+        style={{
+          position: 'absolute',
+          top: '90px',
+          left: '20px',
+          zIndex: 1000,
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#fff',
+          textDecoration: 'none',
+          cursor: 'pointer',
+          transition: 'background-color 0.2s',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+        }}
+        onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        }}
+        onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+        }}
+      >
+        <FiChevronLeft size={24} />
+      </Link>
 
       {/* Share Location Button - Top Middle of Map */}
       <div style={{
@@ -995,6 +1021,7 @@ const KelownaMapPage: React.FC = () => {
         key={`map-${mapMode}-${selectedFilters.size}`}
         center={kelownaPosition}
         zoom={12}
+        zoomControl={true}
         style={{ 
           height: 'calc(100% - 72px)', 
           width: '100%', 
