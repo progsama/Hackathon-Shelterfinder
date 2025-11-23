@@ -692,21 +692,6 @@ const MapPage: React.FC = () => {
             Kelowna Map
           </h1>
         </div>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <Link 
-            to="/settings" 
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#262626',
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontSize: '14px'
-            }}
-          >
-            Settings
-          </Link>
-        </div>
       </div>
 
       {/* Back Button - Top Left of Map */}

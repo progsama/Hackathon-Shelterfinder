@@ -202,8 +202,15 @@ const DMPage: React.FC = () => {
           backgroundColor: '#262626',
           cursor: 'pointer'
         }} />
-        <MdOutlineMenu size={24} style={{ cursor: 'pointer' }} />
-        <BsGrid3X3 size={20} style={{ cursor: 'pointer' }} />
+        <MdOutlineMenu size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} 
+          onClick={() => navigate('/settings')}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
+        <BsGrid3X3 size={20} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        />
       </div>
 
       {/* Central Panel - Messages */}
