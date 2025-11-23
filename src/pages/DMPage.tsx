@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   FiHome, 
@@ -6,7 +6,9 @@ import {
   FiEdit3, 
   FiMoreVertical,
   FiChevronRight,
-  FiMapPin
+  FiMapPin,
+  FiAlertCircle,
+  FiUserCheck
 } from 'react-icons/fi';
 import { 
   HiOutlineHome, 
@@ -31,6 +33,8 @@ interface Message {
   hasAttachment?: boolean;
   isActive?: boolean;
   activeTime?: string;
+  isSOS?: boolean;
+  location?: { lat: number; lng: number };
 }
 
 interface Note {
@@ -42,23 +46,129 @@ interface Note {
 const DMPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'messages' | 'requests'>('messages');
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const notes: Note[] = [
     { id: 1, text: 'Your note' },
     { id: 2, text: 'Map', isMap: true },
   ];
 
-  const messages: Message[] = [
-    { id: 1, name: 'Steve', lastMessage: 'Hey, how are you doing?', time: '18m', unread: true },
-    { id: 2, name: 'John', lastMessage: 'Can we meet tomorrow?', time: '59m', unread: true },
-    { id: 3, name: 'Sarah', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
-    { id: 4, name: 'Mike', lastMessage: 'See you later', time: '3h', unread: false, isActive: true },
-    { id: 5, name: 'Emily', lastMessage: 'That sounds great', time: '5h', unread: false },
-    { id: 6, name: 'David', lastMessage: 'You: Sure, no problem', time: '17h', unread: false },
-    { id: 7, name: 'Lisa', lastMessage: 'Active 1m ago', time: '', unread: false, isActive: true, activeTime: '1m ago' },
-    { id: 8, name: 'Tom', lastMessage: 'You: Let me know when you\'re ready', time: '1d', unread: false },
-    { id: 9, name: 'Anna', lastMessage: 'Active now', time: '', unread: false, isActive: true, activeTime: 'now' },
-  ];
+  // Load messages from localStorage and merge with default messages
+  useEffect(() => {
+    const defaultMessages: Message[] = [
+      { id: 1, name: 'Steve', lastMessage: 'Hey, how are you doing?', time: '18m', unread: true },
+      { id: 2, name: 'John', lastMessage: 'Can we meet tomorrow?', time: '59m', unread: true },
+      { id: 3, name: 'Sarah', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
+      { id: 4, name: 'Mike', lastMessage: 'See you later', time: '3h', unread: false, isActive: true },
+      { id: 5, name: 'Emily', lastMessage: 'That sounds great', time: '5h', unread: false },
+      { id: 6, name: 'David', lastMessage: 'You: Sure, no problem', time: '17h', unread: false },
+      { id: 7, name: 'Lisa', lastMessage: 'Active 1m ago', time: '', unread: false, isActive: true, activeTime: '1m ago' },
+      { id: 8, name: 'Tom', lastMessage: 'You: Let me know when you\'re ready', time: '1d', unread: false },
+      { id: 9, name: 'Anna', lastMessage: 'Active now', time: '', unread: false, isActive: true, activeTime: 'now' },
+    ];
+
+    // Get messages from localStorage
+    const storedMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+    
+    // Merge stored messages with default messages
+    const mergedMessages: Message[] = [...defaultMessages];
+    
+    storedMessages.forEach((storedConv: any) => {
+      const existingIndex = mergedMessages.findIndex(msg => msg.name === storedConv.name);
+      if (existingIndex >= 0) {
+        // Update existing message
+        mergedMessages[existingIndex] = {
+          ...mergedMessages[existingIndex],
+          lastMessage: storedConv.lastMessage,
+          time: storedConv.time,
+          unread: storedConv.unread || false,
+          isSOS: storedConv.messages?.some((m: any) => m.type === 'sos') || false,
+          location: storedConv.messages?.find((m: any) => m.type === 'sos')?.location
+        };
+      } else {
+        // Add new conversation
+        mergedMessages.push({
+          id: mergedMessages.length + 1,
+          name: storedConv.name,
+          lastMessage: storedConv.lastMessage,
+          time: storedConv.time,
+          unread: storedConv.unread || false,
+          isSOS: storedConv.messages?.some((m: any) => m.type === 'sos') || false,
+          location: storedConv.messages?.find((m: any) => m.type === 'sos')?.location
+        });
+      }
+    });
+
+    // Sort by time (most recent first)
+    mergedMessages.sort((a, b) => {
+      if (a.isSOS && !b.isSOS) return -1;
+      if (!a.isSOS && b.isSOS) return 1;
+      return 0;
+    });
+
+    setMessages(mergedMessages);
+  }, []);
+
+  // Listen for storage changes to update messages in real-time
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+      const defaultMessages: Message[] = [
+        { id: 1, name: 'Steve', lastMessage: 'Hey, how are you doing?', time: '18m', unread: true },
+        { id: 2, name: 'John', lastMessage: 'Can we meet tomorrow?', time: '59m', unread: true },
+        { id: 3, name: 'Sarah', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
+        { id: 4, name: 'Mike', lastMessage: 'See you later', time: '3h', unread: false, isActive: true },
+        { id: 5, name: 'Emily', lastMessage: 'That sounds great', time: '5h', unread: false },
+        { id: 6, name: 'David', lastMessage: 'You: Sure, no problem', time: '17h', unread: false },
+        { id: 7, name: 'Lisa', lastMessage: 'Active 1m ago', time: '', unread: false, isActive: true, activeTime: '1m ago' },
+        { id: 8, name: 'Tom', lastMessage: 'You: Let me know when you\'re ready', time: '1d', unread: false },
+        { id: 9, name: 'Anna', lastMessage: 'Active now', time: '', unread: false, isActive: true, activeTime: 'now' },
+      ];
+
+      const mergedMessages: Message[] = [...defaultMessages];
+      
+      storedMessages.forEach((storedConv: any) => {
+        const existingIndex = mergedMessages.findIndex(msg => msg.name === storedConv.name);
+        if (existingIndex >= 0) {
+          mergedMessages[existingIndex] = {
+            ...mergedMessages[existingIndex],
+            lastMessage: storedConv.lastMessage,
+            time: storedConv.time,
+            unread: storedConv.unread || false,
+            isSOS: storedConv.messages?.some((m: any) => m.type === 'sos') || false,
+            location: storedConv.messages?.find((m: any) => m.type === 'sos')?.location
+          };
+        } else {
+          mergedMessages.push({
+            id: mergedMessages.length + 1,
+            name: storedConv.name,
+            lastMessage: storedConv.lastMessage,
+            time: storedConv.time,
+            unread: storedConv.unread || false,
+            isSOS: storedConv.messages?.some((m: any) => m.type === 'sos') || false,
+            location: storedConv.messages?.find((m: any) => m.type === 'sos')?.location
+          });
+        }
+      });
+
+      mergedMessages.sort((a, b) => {
+        if (a.isSOS && !b.isSOS) return -1;
+        if (!a.isSOS && b.isSOS) return 1;
+        return 0;
+      });
+
+      setMessages(mergedMessages);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    // Also check periodically for changes (since storage event doesn't fire in same tab)
+    const interval = setInterval(handleStorageChange, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleNoteClick = (note: Note) => {
     if (note.isMap) {
@@ -280,6 +390,105 @@ const DMPage: React.FC = () => {
 
         {/* Messages List */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
+          {/* Sent SOS Preview */}
+          {selectedTab === 'messages' && (() => {
+            const sentSOS = JSON.parse(localStorage.getItem('sentSOS') || '[]');
+            const latestSOS = sentSOS[sentSOS.length - 1];
+            return latestSOS ? (
+              <div style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid #262626',
+                backgroundColor: 'rgba(237, 73, 86, 0.1)',
+                borderLeft: '3px solid #ed4956'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <FiAlertCircle size={16} color="#ed4956" />
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#ed4956' }}>
+                    You sent an SOS
+                  </span>
+                </div>
+                <div style={{ fontSize: '12px', color: '#8e8e8e', marginLeft: '24px' }}>
+                  Sent to {latestSOS.recipients?.length || 0} close friends • {new Date(latestSOS.sentAt || latestSOS.timestamp).toLocaleTimeString()}
+                </div>
+              </div>
+            ) : null;
+          })()}
+
+          {/* Messages Sent to Close Friends */}
+          {selectedTab === 'messages' && (() => {
+            const storedMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+            const closeFriends = ['Steve', 'John', 'Sarah', 'Mike', 'Emily', 'David', 'Lisa', 'Tom', 'Anna'];
+            const messagesToCF = storedMessages.filter((conv: any) => 
+              closeFriends.includes(conv.name) && conv.messages && conv.messages.length > 0
+            );
+
+            if (messagesToCF.length === 0) return null;
+
+            return (
+              <div style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid #262626',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                borderLeft: '3px solid #22c55e'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <FiUserCheck size={16} color="#22c55e" />
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#22c55e' }}>
+                    Messages sent to Close Friends
+                  </span>
+                </div>
+                <div style={{ fontSize: '12px', color: '#8e8e8e', marginLeft: '24px', marginBottom: '8px' }}>
+                  {messagesToCF.length} conversation{messagesToCF.length !== 1 ? 's' : ''} with close friends
+                </div>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '6px',
+                  marginLeft: '24px',
+                  maxHeight: '200px',
+                  overflowY: 'auto'
+                }}>
+                  {messagesToCF.map((conv: any, idx: number) => {
+                    const lastMessage = conv.messages[conv.messages.length - 1];
+                    const isSOS = lastMessage?.type === 'sos';
+                    return (
+                      <div 
+                        key={idx}
+                        style={{
+                          padding: '8px 12px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                          borderRadius: '8px',
+                          border: isSOS ? '1px solid rgba(237, 73, 86, 0.3)' : '1px solid rgba(34, 197, 94, 0.3)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#fff' }}>
+                            {conv.name}
+                          </span>
+                          {isSOS && <FiAlertCircle size={12} color="#ed4956" />}
+                          <span style={{ fontSize: '10px', color: '#8e8e8e', marginLeft: 'auto' }}>
+                            {conv.time || 'now'}
+                          </span>
+                        </div>
+                        <div style={{ 
+                          fontSize: '11px', 
+                          color: isSOS ? '#ed4956' : '#8e8e8e',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {isSOS 
+                            ? '🚨 SOS Alert: I need help! My location: [Location Link]'
+                            : lastMessage?.message || conv.lastMessage || 'No message'
+                          }
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
           {selectedTab === 'messages' && messages.map((msg) => (
             <div
               key={msg.id}
@@ -287,7 +496,8 @@ const DMPage: React.FC = () => {
                 padding: '12px 16px',
                 borderBottom: '1px solid #262626',
                 cursor: 'pointer',
-                backgroundColor: msg.unread ? '#1a1a1a' : 'transparent',
+                backgroundColor: msg.isSOS ? 'rgba(237, 73, 86, 0.1)' : (msg.unread ? '#1a1a1a' : 'transparent'),
+                borderLeft: msg.isSOS ? '3px solid #ed4956' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px'
@@ -345,24 +555,38 @@ const DMPage: React.FC = () => {
                   alignItems: 'center',
                   gap: '4px'
                 }}>
+                  {msg.isSOS && (
+                    <FiAlertCircle size={16} color="#ed4956" style={{ flexShrink: 0 }} />
+                  )}
                   <p style={{
-                    color: '#8e8e8e',
+                    color: msg.isSOS ? '#ed4956' : '#8e8e8e',
                     margin: 0,
                     fontSize: '14px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    flex: 1
+                    flex: 1,
+                    fontWeight: msg.isSOS ? '600' : '400'
                   }}>
-                    {msg.lastMessage}
+                    {msg.isSOS ? '🚨 SOS Alert: I need help! My location: [Location Link]' : msg.lastMessage}
                   </p>
-                  {msg.unread && (
+                  {msg.unread && !msg.isSOS && (
                     <div style={{
                       width: '8px',
                       height: '8px',
                       borderRadius: '50%',
                       backgroundColor: '#0095f6',
                       flexShrink: 0
+                    }} />
+                  )}
+                  {msg.isSOS && (
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: '#ed4956',
+                      flexShrink: 0,
+                      animation: 'pulse 2s ease-in-out infinite'
                     }} />
                   )}
                 </div>

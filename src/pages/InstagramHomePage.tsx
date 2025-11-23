@@ -58,26 +58,26 @@ const InstagramHomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const stories: Story[] = [
-    { id: 1, username: 'aryanx_c728', image: 'https://picsum.photos/seed/story1/150/150' },
-    { id: 2, username: 'farmal_ch', image: 'https://picsum.photos/seed/story2/150/150' },
-    { id: 3, username: 'chloedsou', image: 'https://picsum.photos/seed/story3/150/150' },
-    { id: 4, username: 'itsvik_mzr', image: 'https://picsum.photos/seed/story4/150/150' },
-    { id: 5, username: '_shreya.pa', image: 'https://picsum.photos/seed/story5/150/150' },
-    { id: 6, username: 'riddzrosh_', image: 'https://picsum.photos/seed/story6/150/150' },
-    { id: 7, username: 'user7', image: 'https://picsum.photos/seed/story7/150/150' },
-    { id: 8, username: 'user8', image: 'https://picsum.photos/seed/story8/150/150' },
+    { id: 1, username: 'user_one', image: 'https://picsum.photos/seed/story1/150/150' },
+    { id: 2, username: 'user_two', image: 'https://picsum.photos/seed/story2/150/150' },
+    { id: 3, username: 'user_three', image: 'https://picsum.photos/seed/story3/150/150' },
+    { id: 4, username: 'user_four', image: 'https://picsum.photos/seed/story4/150/150' },
+    { id: 5, username: 'user_five', image: 'https://picsum.photos/seed/story5/150/150' },
+    { id: 6, username: 'user_six', image: 'https://picsum.photos/seed/story6/150/150' },
+    { id: 7, username: 'user_seven', image: 'https://picsum.photos/seed/story7/150/150' },
+    { id: 8, username: 'user_eight', image: 'https://picsum.photos/seed/story8/150/150' },
   ];
 
   const posts: Post[] = [
     {
       id: 1,
-      username: 'ringmagazine',
-      userImage: 'https://picsum.photos/seed/ring1/40/40',
+      username: 'featured_account',
+      userImage: 'https://picsum.photos/seed/post1/40/40',
       verified: true,
       image: 'https://picsum.photos/seed/post1/600/600',
       likes: 12543,
-      caption: 'DEVIN HANEY WINNING - Check out the latest boxing updates! 🥊',
-      timeAgo: '58m',
+      caption: 'Check out our latest updates! 🎉',
+      timeAgo: '1h',
       comments: 234,
       isLiked: false,
       isSaved: false
@@ -136,32 +136,32 @@ const InstagramHomePage: React.FC = () => {
   const suggestedUsers: SuggestedUser[] = [
     {
       id: 1,
-      username: 'MEMEZAR',
-      fullName: 'MEMES &...',
+      username: 'suggested_user1',
+      fullName: 'Suggested Account',
       image: 'https://picsum.photos/seed/suggest1/40/40',
       verified: true,
-      mutualFollowers: 'sriya_sd + 74 m'
+      mutualFollowers: 'friend1 + 74 others'
     },
     {
       id: 2,
-      username: 'Shrey',
+      username: 'suggested_user2',
       fullName: '',
       image: 'https://picsum.photos/seed/suggest2/40/40',
-      mutualFollowers: 'aaq1b._'
+      mutualFollowers: 'friend2'
     },
     {
       id: 3,
-      username: 'Keya',
+      username: 'suggested_user3',
       fullName: '',
       image: 'https://picsum.photos/seed/suggest3/40/40',
-      mutualFollowers: 'sriya_sd + 27 m'
+      mutualFollowers: 'friend3 + 27 others'
     },
     {
       id: 4,
-      username: 'urvi',
+      username: 'suggested_user4',
       fullName: '',
       image: 'https://picsum.photos/seed/suggest4/40/40',
-      mutualFollowers: 'raihanfirosh05 +'
+      mutualFollowers: 'friend4 + 5 others'
     },
   ];
 
@@ -499,7 +499,7 @@ const InstagramHomePage: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img
               src="https://picsum.photos/seed/currentuser/56/56"
-              alt="arynnrosh"
+              alt="username"
               style={{
                 width: '56px',
                 height: '56px',
@@ -509,8 +509,8 @@ const InstagramHomePage: React.FC = () => {
               }}
             />
             <div>
-              <div style={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>arynnrosh</div>
-              <div style={{ fontSize: '14px', color: '#8e8e8e' }}>aryan roshan</div>
+              <div style={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>username</div>
+              <div style={{ fontSize: '14px', color: '#8e8e8e' }}>Full Name</div>
             </div>
           </div>
           <button

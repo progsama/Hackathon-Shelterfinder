@@ -3,7 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import MapController from '../components/MapController';
 import MapRefSetter from '../components/MapRefSetter';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink } from 'react-icons/fi';
+import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiX, FiUsers, FiUser, FiUserCheck } from 'react-icons/fi';
+import { BsThreeDots } from 'react-icons/bs';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -218,6 +219,8 @@ interface EmergencyService {
   phone?: string;
 }
 
+type LocationSharingType = 'public' | 'close-friends' | 'individuals' | 'none';
+
 const KelownaMapPage: React.FC = () => {
   const navigate = useNavigate();
   const [mapMode, setMapMode] = useState<'map' | 'sos'>('map');
@@ -226,6 +229,10 @@ const KelownaMapPage: React.FC = () => {
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set());
   const [selectedService, setSelectedService] = useState<EmergencyService | null>(null);
   const [mapRef, setMapRef] = useState<L.Map | null>(null);
+  const [locationSharing, setLocationSharing] = useState<LocationSharingType>('none');
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showSOSConfirmation, setShowSOSConfirmation] = useState(false);
+  const [sosRecipientsCount, setSosRecipientsCount] = useState(0);
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
   
   
@@ -455,6 +462,97 @@ const KelownaMapPage: React.FC = () => {
     setSelectedService(service);
   };
 
+  const handleLocationSharingChange = (type: LocationSharingType) => {
+    setLocationSharing(type);
+    setShowLocationModal(false);
+  };
+
+  const handleSendSOS = () => {
+    // Get current location (using map center as fallback)
+    const currentLocation = mapRef?.getCenter() || { lat: kelownaPosition[0], lng: kelownaPosition[1] };
+    const locationUrl = `https://www.google.com/maps?q=${currentLocation.lat},${currentLocation.lng}`;
+    
+    // Close friends list (mock data - in real app this would come from user's close friends)
+    const closeFriends = ['Steve', 'John', 'Sarah', 'Mike', 'Emily', 'David', 'Lisa', 'Tom', 'Anna'];
+    
+    // Create SOS message
+    const sosMessage = {
+      type: 'sos',
+      sender: 'You',
+      message: `🚨 SOS Alert: I need help! My location: ${locationUrl}`,
+      location: { lat: currentLocation.lat, lng: currentLocation.lng },
+      timestamp: new Date().toISOString(),
+      recipients: closeFriends
+    };
+    
+    // Get existing messages from localStorage
+    const existingMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+    
+    // Add SOS message to each close friend's conversation
+    closeFriends.forEach(friendName => {
+      // Find or create conversation with this friend
+      let conversation = existingMessages.find((msg: any) => msg.name === friendName);
+      
+      if (!conversation) {
+        conversation = {
+          id: existingMessages.length + 1,
+          name: friendName,
+          messages: []
+        };
+        existingMessages.push(conversation);
+      }
+      
+      // Add SOS message
+      conversation.messages.push({
+        ...sosMessage,
+        id: conversation.messages.length + 1,
+        time: 'now'
+      });
+      
+      // Update last message and time
+      conversation.lastMessage = sosMessage.message;
+      conversation.time = 'now';
+      conversation.unread = true;
+    });
+    
+    // Save to localStorage
+    localStorage.setItem('dmMessages', JSON.stringify(existingMessages));
+    
+    // Also store sent SOS for preview on DM page
+    const sentSOS = JSON.parse(localStorage.getItem('sentSOS') || '[]');
+    sentSOS.push({
+      ...sosMessage,
+      sentAt: new Date().toISOString()
+    });
+    localStorage.setItem('sentSOS', JSON.stringify(sentSOS));
+    
+    // Close location modal
+    setShowLocationModal(false);
+    
+    // Show Instagram-style confirmation popup
+    setSosRecipientsCount(closeFriends.length);
+    setShowSOSConfirmation(true);
+    
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+      setShowSOSConfirmation(false);
+    }, 3000);
+  };
+
+  const getLocationButtonText = () => {
+    if (locationSharing === 'none') {
+      return 'Not sharing location';
+    }
+    return 'Sharing location';
+  };
+
+  const getLocationButtonIcon = () => {
+    if (locationSharing === 'none') {
+      return <FiMapPin size={16} style={{ transform: 'rotate(45deg)' }} />;
+    }
+    return <FiMapPin size={16} />;
+  };
+
   return (
     <div style={{ height: '100vh', width: '100vw', position: 'relative', backgroundColor: '#000' }}>
       <style>{`
@@ -479,6 +577,24 @@ const KelownaMapPage: React.FC = () => {
         .memory-thumbnail-wrapper:hover {
           animation: none !important;
           transform: scale(1.1) !important;
+        }
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
       `}</style>
       <div style={{
@@ -505,7 +621,33 @@ const KelownaMapPage: React.FC = () => {
             Kelowna Map
           </h1>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <button
+            onClick={() => setShowLocationModal(true)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: locationSharing === 'none' ? '#262626' : '#0095f6',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '20px',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              fontWeight: '500',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = locationSharing === 'none' ? '#363636' : '#0084d4';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = locationSharing === 'none' ? '#262626' : '#0095f6';
+            }}
+          >
+            {getLocationButtonIcon()}
+            {getLocationButtonText()}
+          </button>
           <Link 
             to="/dm" 
             style={{
@@ -1526,6 +1668,500 @@ const KelownaMapPage: React.FC = () => {
               color: '#8e8e8e'
             }}>
               Location: {selectedMemory.position[0].toFixed(4)}, {selectedMemory.position[1].toFixed(4)}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Location Sharing Modal */}
+      {showLocationModal && (
+        <div
+          onClick={() => setShowLocationModal(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#1a1a1a',
+              borderRadius: '20px 20px 0 0',
+              padding: '24px',
+              width: '100%',
+              maxWidth: '500px',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              border: '1px solid #262626',
+              cursor: 'default'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#fff' }}>
+                Who can see your location
+              </h2>
+              <button
+                onClick={() => setShowLocationModal(false)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#262626';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <BsThreeDots size={20} style={{ transform: 'rotate(90deg)' }} />
+              </button>
+            </div>
+
+            <p style={{
+              margin: '0 0 24px 0',
+              color: '#8e8e8e',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              If you share, your precise location updates every time you open Instagram. It disappears if you don't open the app for 24 hours. <a href="#" style={{ color: '#0095f6', textDecoration: 'none' }}>Learn more</a>
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* Public Option */}
+              <div
+                onClick={() => handleLocationSharingChange('public')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: locationSharing === 'public' ? '#262626' : 'transparent',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  border: '1px solid #262626',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (locationSharing !== 'public') {
+                    e.currentTarget.style.backgroundColor = '#1a1a1a';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (locationSharing !== 'public') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: '#0095f6',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FiUsers size={20} color="#fff" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '500', color: '#fff', marginBottom: '4px' }}>
+                      Friends
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#8e8e8e' }}>
+                      422 followers you follow back
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  border: locationSharing === 'public' ? '6px solid #fff' : '2px solid #8e8e8e',
+                  backgroundColor: locationSharing === 'public' ? '#fff' : 'transparent'
+                }} />
+              </div>
+
+              {/* Close Friends Option */}
+              <div
+                onClick={() => handleLocationSharingChange('close-friends')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: locationSharing === 'close-friends' ? '#262626' : 'transparent',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  border: '1px solid #262626',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (locationSharing !== 'close-friends') {
+                    e.currentTarget.style.backgroundColor = '#1a1a1a';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (locationSharing !== 'close-friends') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: '#22c55e',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FiUserCheck size={20} color="#fff" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '500', color: '#fff', marginBottom: '4px' }}>
+                      Close Friends
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#8e8e8e' }}>
+                      10 people &gt;
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  border: locationSharing === 'close-friends' ? '6px solid #fff' : '2px solid #8e8e8e',
+                  backgroundColor: locationSharing === 'close-friends' ? '#fff' : 'transparent'
+                }} />
+              </div>
+
+              {/* Individuals Option */}
+              <div
+                onClick={() => handleLocationSharingChange('individuals')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: locationSharing === 'individuals' ? '#262626' : 'transparent',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  border: '1px solid #262626',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (locationSharing !== 'individuals') {
+                    e.currentTarget.style.backgroundColor = '#1a1a1a';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (locationSharing !== 'individuals') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: '#8e8e8e',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FiUser size={20} color="#fff" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '500', color: '#fff', marginBottom: '4px' }}>
+                      Only these friends
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#8e8e8e' }}>
+                      Choose people &gt;
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  border: locationSharing === 'individuals' ? '6px solid #fff' : '2px solid #8e8e8e',
+                  backgroundColor: locationSharing === 'individuals' ? '#fff' : 'transparent'
+                }} />
+              </div>
+
+              {/* No One Option */}
+              <div
+                onClick={() => handleLocationSharingChange('none')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: locationSharing === 'none' ? '#262626' : 'transparent',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  border: '1px solid #262626',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (locationSharing !== 'none') {
+                    e.currentTarget.style.backgroundColor = '#1a1a1a';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (locationSharing !== 'none') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: '#8e8e8e',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative'
+                  }}>
+                    <FiMapPin size={20} color="#fff" />
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%) rotate(45deg)',
+                      width: '2px',
+                      height: '24px',
+                      backgroundColor: '#fff'
+                    }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '500', color: '#fff', marginBottom: '4px' }}>
+                      No one
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#8e8e8e' }}>
+                      Don't share location
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  border: locationSharing === 'none' ? '6px solid #fff' : '2px solid #8e8e8e',
+                  backgroundColor: locationSharing === 'none' ? '#fff' : 'transparent'
+                }} />
+              </div>
+            </div>
+
+            {/* SOS Button */}
+            <button
+              onClick={handleSendSOS}
+              style={{
+                width: '100%',
+                marginTop: '24px',
+                padding: '14px',
+                backgroundColor: '#ed4956',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'background-color 0.2s',
+                animation: 'pulse 2s ease-in-out infinite'
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#dc3545';
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#ed4956';
+              }}
+            >
+              <FiAlertCircle size={20} />
+              Send SOS to Close Friends
+            </button>
+
+            <button
+              onClick={() => setShowLocationModal(false)}
+              style={{
+                width: '100%',
+                marginTop: '12px',
+                padding: '12px',
+                backgroundColor: '#0095f6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#0084d4';
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#0095f6';
+              }}
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* SOS Confirmation Popup */}
+      {showSOSConfirmation && (
+        <div
+          onClick={() => setShowSOSConfirmation(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 3000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#1a1a1a',
+              borderRadius: '12px',
+              padding: '24px',
+              maxWidth: '400px',
+              width: '90%',
+              border: '1px solid #262626',
+              cursor: 'default',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+              animation: 'fadeIn 0.3s ease-out'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '16px',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(237, 73, 86, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '8px'
+              }}>
+                <FiAlertCircle size={32} color="#ed4956" />
+              </div>
+              
+              <h2 style={{
+                margin: 0,
+                fontSize: '20px',
+                fontWeight: '600',
+                color: '#fff'
+              }}>
+                SOS Sent
+              </h2>
+              
+              <p style={{
+                margin: 0,
+                fontSize: '14px',
+                color: '#8e8e8e',
+                lineHeight: '1.5'
+              }}>
+                Your SOS alert has been sent to <strong style={{ color: '#fff' }}>{sosRecipientsCount} close friends</strong> with your current location.
+              </p>
+              
+              <button
+                onClick={() => {
+                  setShowSOSConfirmation(false);
+                  navigate('/dm');
+                }}
+                style={{
+                  width: '100%',
+                  marginTop: '8px',
+                  padding: '10px',
+                  backgroundColor: '#0095f6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#0084d4';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#0095f6';
+                }}
+              >
+                View Messages
+              </button>
+              
+              <button
+                onClick={() => setShowSOSConfirmation(false)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: 'transparent',
+                  color: '#8e8e8e',
+                  border: 'none',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.color = '#fff';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.color = '#8e8e8e';
+                }}
+              >
+                Dismiss
+              </button>
             </div>
           </div>
         </div>
