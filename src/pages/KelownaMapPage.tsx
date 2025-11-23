@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import MapController from '../components/MapController';
 import MapRefSetter from '../components/MapRefSetter';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink } from 'react-icons/fi';
+import { FiMapPin, FiNavigation, FiHeart, FiAlertCircle, FiPhone, FiExternalLink, FiShoppingBag } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -209,6 +209,31 @@ const createShelterIcon = (): L.DivIcon => {
   });
 };
 
+// Create custom icon for business support locations
+const createBusinessIcon = (): L.DivIcon => {
+  return L.divIcon({
+    className: 'business-marker',
+    html: `
+      <div style="
+        width: 0;
+        height: 0;
+        position: relative;
+      ">
+        <svg width="28" height="28" viewBox="0 0 28 28" style="
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+          cursor: pointer;
+        ">
+          <circle cx="14" cy="14" r="12" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+          <path d="M14 8 L14 20 M8 14 L20 14" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28],
+  });
+};
+
 interface EmergencyService {
   id: number;
   name: string;
@@ -218,13 +243,23 @@ interface EmergencyService {
   phone?: string;
 }
 
+interface Business {
+  id: number;
+  name: string;
+  description: string;
+  address: string;
+  position: [number, number];
+}
+
 const KelownaMapPage: React.FC = () => {
   const navigate = useNavigate();
   const [mapMode, setMapMode] = useState<'map' | 'sos'>('map');
+  const [sosTab, setSosTab] = useState<'emergency' | 'aid'>('emergency');
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
   const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set());
   const [selectedService, setSelectedService] = useState<EmergencyService | null>(null);
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [mapRef, setMapRef] = useState<L.Map | null>(null);
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
   
@@ -422,6 +457,57 @@ const KelownaMapPage: React.FC = () => {
   ];
 
   const filteredShelters = selectedFilters.has('Shelters') ? shelters : [];
+
+  // Business support locations from PDF
+  const businesses: Business[] = [
+    {
+      id: 1,
+      name: 'Born to Shake',
+      description: 'Ice for coolers, use of their kitchen, drinking water, coffee, transport help with their van.',
+      address: '889 Vaughan Ave #110, Kelowna, BC V1Y 0H8',
+      position: [49.8850, -119.4900]
+    },
+    {
+      id: 2,
+      name: 'Pretty Not Bad',
+      description: 'Lunch for evacuees.',
+      address: '1-740 Clement Ave, Kelowna, BC',
+      position: [49.8900, -119.4950]
+    },
+    {
+      id: 3,
+      name: 'Cobs Bread West K',
+      description: 'Food for evacuees.',
+      address: 'Unit #107, 2231 Louie Dr, West Bank, BC V4T 3K3',
+      position: [49.8500, -119.6000]
+    },
+    {
+      id: 4,
+      name: 'Bright Jenny',
+      description: 'Free drip coffee and place to sort out life (free wifi etc).',
+      address: '1977 Kirschner Rd, Kelowna, BC V1Y 4N7',
+      position: [49.8950, -119.4850]
+    },
+    {
+      id: 5,
+      name: 'Panevino Pizza',
+      description: 'Free meals for evacuees.',
+      address: '3996 Irvine Rd, Oyama, BC V4V 2G4',
+      position: [50.0500, -119.3700]
+    },
+    {
+      id: 6,
+      name: 'Orchard Park Plaza',
+      description: 'Free trailer and RV parking.',
+      address: '740 Hollywood Rd S, Kelowna, BC',
+      position: [49.8800, -119.4700]
+    }
+  ];
+
+  const handleGetDirectionsBusiness = (business: Business) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${business.position[0]},${business.position[1]}`;
+    window.open(url, '_blank');
+  };
 
   useEffect(() => {
     if (mapRef) {
@@ -653,8 +739,48 @@ const KelownaMapPage: React.FC = () => {
           </Marker>
         ))}
 
-        {/* Shelter Markers - Only show in SOS mode when Shelters filter is selected */}
-        {mapMode === 'sos' && selectedFilters.has('Shelters') && filteredShelters.map((shelter) => (
+
+        {/* Emergency Service Markers - Only show in SOS mode when Emergency Services tab is active and filters are selected */}
+        {mapMode === 'sos' && sosTab === 'emergency' && selectedFilters.size > 0 && filteredServices.map((service) => (
+          <Marker 
+            key={service.id} 
+            position={service.position}
+            icon={createSOSIcon(service.type)}
+            eventHandlers={{
+              click: () => handleServiceClick(service)
+            }}
+          >
+            <Popup>
+              <div>
+                <strong>{service.name}</strong>
+                <p style={{ fontSize: '12px', color: '#8e8e8e', marginTop: '4px' }}>
+                  {service.type}
+                </p>
+                <p style={{ fontSize: '12px', color: '#8e8e8e', marginTop: '4px' }}>
+                  {service.address}
+                </p>
+                <button
+                  onClick={() => handleServiceClick(service)}
+                  style={{
+                    marginTop: '8px',
+                    padding: '6px 12px',
+                    backgroundColor: '#22c55e',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  View Details
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+
+        {/* Shelter Markers - Only show in SOS mode when Emergency Services tab is active and Shelters filter is selected */}
+        {mapMode === 'sos' && sosTab === 'emergency' && selectedFilters.has('Shelters') && filteredShelters.map((shelter) => (
           <Marker 
             key={shelter.id} 
             position={shelter.position}
@@ -698,43 +824,16 @@ const KelownaMapPage: React.FC = () => {
           </Marker>
         ))}
 
-        {/* Emergency Service Markers - Only show in SOS mode when filters are selected */}
-        {mapMode === 'sos' && selectedFilters.size > 0 && filteredServices.map((service) => (
+        {/* Business Support Markers - Only show in SOS mode when Aid tab is active */}
+        {mapMode === 'sos' && sosTab === 'aid' && businesses.map((business) => (
           <Marker 
-            key={service.id} 
-            position={service.position}
-            icon={createSOSIcon(service.type)}
+            key={business.id} 
+            position={business.position}
+            icon={createBusinessIcon()}
             eventHandlers={{
-              click: () => handleServiceClick(service)
+              click: () => setSelectedBusiness(business)
             }}
-          >
-            <Popup>
-              <div>
-                <strong>{service.name}</strong>
-                <p style={{ fontSize: '12px', color: '#8e8e8e', marginTop: '4px' }}>
-                  {service.type}
-                </p>
-                <p style={{ fontSize: '12px', color: '#8e8e8e', marginTop: '4px' }}>
-                  {service.address}
-                </p>
-                <button
-                  onClick={() => handleServiceClick(service)}
-                  style={{
-                    marginTop: '8px',
-                    padding: '6px 12px',
-                    backgroundColor: '#22c55e',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  View Details
-                </button>
-              </div>
-            </Popup>
-          </Marker>
+          />
         ))}
       </MapContainer>
 
@@ -875,158 +974,301 @@ const KelownaMapPage: React.FC = () => {
           bottom: '90px',
           left: '20px',
           zIndex: 100,
-          backgroundColor: 'rgba(255, 48, 64, 0.15)',
-          padding: '16px',
+          backgroundColor: '#1a1a1a',
+          padding: '0',
           borderRadius: '16px',
           color: '#fff',
           maxWidth: '350px',
           maxHeight: '60vh',
-          overflowY: 'auto',
+          overflow: 'hidden',
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 48, 64, 0.3)',
-          transition: 'opacity 0.3s ease'
+          border: '2px solid #333',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.5)',
+          transition: 'opacity 0.3s ease',
+          display: 'flex',
+          flexDirection: 'column'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <FiAlertCircle size={20} color="#ff3040" />
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>Emergency Services</h3>
-          </div>
-          
-          <div style={{ marginBottom: '12px' }}>
-            <p style={{ margin: '0 0 8px 0', color: '#ffb3b8', fontSize: '12px', fontWeight: '600' }}>
-              Filter by Type:
-            </p>
-            <div style={{ 
-              display: 'flex', 
-              gap: '6px', 
-              flexWrap: 'wrap',
-              marginBottom: '8px'
-            }}>
-              {allCategories.map((type) => (
-                <button
-                  key={type}
-                  onClick={() => toggleFilter(type)}
-                  style={{
-                    padding: '6px 10px',
-                    backgroundColor: selectedFilters.has(type) 
-                      ? 'rgba(255, 48, 64, 0.5)' 
-                      : 'rgba(255, 48, 64, 0.2)',
-                    borderRadius: '8px',
-                    fontSize: '11px',
-                    border: selectedFilters.has(type)
-                      ? '1px solid rgba(255, 48, 64, 0.8)'
-                      : '1px solid rgba(255, 48, 64, 0.3)',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!selectedFilters.has(type)) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.3)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!selectedFilters.has(type)) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.2)';
-                    }
-                  }}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-            {selectedFilters.size > 0 && (
-              <button
-                onClick={() => setSelectedFilters(new Set())}
-                style={{
-                  padding: '4px 8px',
-                  backgroundColor: 'transparent',
-                  borderRadius: '6px',
-                  fontSize: '11px',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  marginTop: '4px'
-                }}
-              >
-                Clear Filters
-              </button>
-            )}
+          {/* Tab Buttons */}
+          <div style={{
+            display: 'flex',
+            borderBottom: '2px solid #333',
+            backgroundColor: '#0f0f0f'
+          }}>
+            <button
+              onClick={() => setSosTab('emergency')}
+              style={{
+                flex: 1,
+                padding: '14px 16px',
+                backgroundColor: sosTab === 'emergency' ? '#1a1a1a' : 'transparent',
+                color: sosTab === 'emergency' ? '#fff' : '#999',
+                border: 'none',
+                borderBottom: sosTab === 'emergency' ? '3px solid #ff3040' : '3px solid transparent',
+                fontSize: '15px',
+                fontWeight: sosTab === 'emergency' ? '600' : '400',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                if (sosTab !== 'emergency') {
+                  e.currentTarget.style.backgroundColor = '#262626';
+                  e.currentTarget.style.color = '#ccc';
+                }
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                if (sosTab !== 'emergency') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#999';
+                }
+              }}
+            >
+              <FiAlertCircle size={18} />
+              Emergency Services
+            </button>
+            <button
+              onClick={() => setSosTab('aid')}
+              style={{
+                flex: 1,
+                padding: '14px 16px',
+                backgroundColor: sosTab === 'aid' ? '#1a1a1a' : 'transparent',
+                color: sosTab === 'aid' ? '#fff' : '#999',
+                border: 'none',
+                borderBottom: sosTab === 'aid' ? '3px solid #3b82f6' : '3px solid transparent',
+                fontSize: '15px',
+                fontWeight: sosTab === 'aid' ? '600' : '400',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                if (sosTab !== 'aid') {
+                  e.currentTarget.style.backgroundColor = '#262626';
+                  e.currentTarget.style.color = '#ccc';
+                }
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                if (sosTab !== 'aid') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#999';
+                }
+              }}
+            >
+              <FiShoppingBag size={18} />
+              Aid
+            </button>
           </div>
 
-          <p style={{ margin: '0 0 12px 0', color: '#ffb3b8', fontSize: '12px', lineHeight: '1.4' }}>
-            Showing {filteredServices.length} services, {filteredShelters.length} shelters
-          </p>
-          
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            gap: '8px',
-            marginTop: '12px'
-          }}>
-            {filteredServices.map((service) => (
-              <div 
-                key={service.id}
-                onClick={() => handleServiceClick(service)}
-                style={{
-                  padding: '10px',
-                  backgroundColor: 'rgba(255, 48, 64, 0.2)',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(255, 48, 64, 0.3)',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.2)';
-                }}
-              >
-                <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '4px' }}>
-                  {service.name}
+          {/* Tab Content */}
+          <div style={{ padding: '16px', overflowY: 'auto', flex: 1 }}>
+            {sosTab === 'emergency' && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                  <FiAlertCircle size={20} color="#ff3040" />
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#fff' }}>Emergency Services</h3>
                 </div>
-                <div style={{ fontSize: '11px', color: '#ffb3b8', marginBottom: '4px' }}>
-                  {service.type}
+                
+                <div style={{ marginBottom: '12px' }}>
+                  <p style={{ margin: '0 0 8px 0', color: '#e0e0e0', fontSize: '12px', fontWeight: '600' }}>
+                    Filter by Type:
+                  </p>
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: '6px', 
+                    flexWrap: 'wrap',
+                    marginBottom: '8px'
+                  }}>
+                    {allCategories.map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => toggleFilter(type)}
+                        style={{
+                          padding: '6px 10px',
+                          backgroundColor: selectedFilters.has(type) 
+                            ? 'rgba(255, 48, 64, 0.5)' 
+                            : 'rgba(255, 48, 64, 0.2)',
+                          borderRadius: '8px',
+                          fontSize: '11px',
+                          border: selectedFilters.has(type)
+                            ? '1px solid rgba(255, 48, 64, 0.8)'
+                            : '1px solid rgba(255, 48, 64, 0.3)',
+                          color: '#fff',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!selectedFilters.has(type)) {
+                            e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.3)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!selectedFilters.has(type)) {
+                            e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.2)';
+                          }
+                        }}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedFilters.size > 0 && (
+                    <button
+                      onClick={() => setSelectedFilters(new Set())}
+                      style={{
+                        padding: '4px 8px',
+                        backgroundColor: 'transparent',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        marginTop: '4px'
+                      }}
+                    >
+                      Clear Filters
+                    </button>
+                  )}
                 </div>
-                <div style={{ fontSize: '10px', color: '#8e8e8e' }}>
-                  {service.address}
+
+                <p style={{ margin: '0 0 12px 0', color: '#e0e0e0', fontSize: '12px', lineHeight: '1.4' }}>
+                  Showing {filteredServices.length} services, {filteredShelters.length} shelters
+                </p>
+                
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginTop: '12px'
+                }}>
+                  {filteredServices.map((service) => (
+                    <div 
+                      key={service.id}
+                      onClick={() => handleServiceClick(service)}
+                      style={{
+                        padding: '10px',
+                        backgroundColor: 'rgba(255, 48, 64, 0.2)',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(255, 48, 64, 0.3)',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.3)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 48, 64, 0.2)';
+                      }}
+                    >
+                      <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '4px', color: '#fff' }}>
+                        {service.name}
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#ffb3b8', marginBottom: '4px' }}>
+                        {service.type}
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#bbb' }}>
+                        {service.address}
+                      </div>
+                    </div>
+                  ))}
+                  {filteredShelters.map((shelter) => (
+                    <div 
+                      key={shelter.id}
+                      onClick={() => setSelectedShelter(shelter)}
+                      style={{
+                        padding: '10px',
+                        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(34, 197, 94, 0.3)',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.3)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.2)';
+                      }}
+                    >
+                      <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '4px', color: '#fff' }}>
+                        {shelter.operator}
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#86efac', marginBottom: '4px' }}>
+                        {shelter.type}
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#bbb', marginBottom: '4px' }}>
+                        {shelter.address}
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#bbb' }}>
+                        {shelter.beds} beds
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-            {filteredShelters.map((shelter) => (
-              <div 
-                key={shelter.id}
-                onClick={() => setSelectedShelter(shelter)}
-                style={{
-                  padding: '10px',
-                  backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(34, 197, 94, 0.3)',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.2)';
-                }}
-              >
-                <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '4px' }}>
-                  {shelter.operator}
+              </>
+            )}
+
+            {sosTab === 'aid' && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                  <FiShoppingBag size={20} color="#3b82f6" />
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#fff' }}>Aid</h3>
                 </div>
-                <div style={{ fontSize: '11px', color: '#86efac', marginBottom: '4px' }}>
-                  {shelter.type}
+                <p style={{ margin: '0 0 16px 0', color: '#e0e0e0', fontSize: '14px', lineHeight: '1.5' }}>
+                  Find businesses around you that are providing services during the emergency.
+                </p>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginTop: '12px'
+                }}>
+                  {businesses.map((business) => (
+                    <div
+                      key={business.id}
+                      onClick={() => setSelectedBusiness(business)}
+                      style={{
+                        padding: '12px',
+                        backgroundColor: '#2a2a2a',
+                        borderRadius: '10px',
+                        border: '1px solid #3b82f6',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
+                        e.currentTarget.style.backgroundColor = '#333';
+                        e.currentTarget.style.borderColor = '#60a5fa';
+                      }}
+                      onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => {
+                        e.currentTarget.style.backgroundColor = '#2a2a2a';
+                        e.currentTarget.style.borderColor = '#3b82f6';
+                      }}
+                    >
+                      <div style={{ 
+                        fontWeight: '600', 
+                        color: '#fff', 
+                        fontSize: '14px',
+                        marginBottom: '4px'
+                      }}>
+                        {business.name}
+                      </div>
+                      <div style={{ 
+                        color: '#bbb', 
+                        fontSize: '12px',
+                        lineHeight: '1.4'
+                      }}>
+                        {business.description}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div style={{ fontSize: '10px', color: '#8e8e8e', marginBottom: '4px' }}>
-                  {shelter.address}
-                </div>
-                <div style={{ fontSize: '10px', color: '#8e8e8e' }}>
-                  {shelter.beds} beds
-                </div>
-              </div>
-            ))}
+              </>
+            )}
           </div>
         </div>
       )}
@@ -1217,6 +1459,116 @@ const KelownaMapPage: React.FC = () => {
                 {selectedShelter.phone}
               </a>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Business Info Modal */}
+      {selectedBusiness && (
+        <div
+          onClick={() => setSelectedBusiness(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#1a1a1a',
+              borderRadius: '16px',
+              padding: '24px',
+              maxWidth: '400px',
+              width: '90%',
+              border: '1px solid #333',
+              cursor: 'default'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#fff' }}>
+                {selectedBusiness.name}
+              </h2>
+              <button
+                onClick={() => setSelectedBusiness(null)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = '#333';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div style={{ color: '#e0e0e0', fontSize: '14px', marginBottom: '16px', lineHeight: '1.6' }}>
+              <div style={{ marginBottom: '12px' }}>
+                <strong style={{ color: '#3b82f6', display: 'block', marginBottom: '4px' }}>DESCRIPTION:</strong>
+                {selectedBusiness.description}
+              </div>
+              <div>
+                <strong style={{ color: '#3b82f6', display: 'block', marginBottom: '4px' }}>ADDRESS:</strong>
+                {selectedBusiness.address}
+              </div>
+            </div>
+
+            <button
+              onClick={() => handleGetDirectionsBusiness(selectedBusiness)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                backgroundColor: '#3b82f6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#2563eb';
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.currentTarget.style.backgroundColor = '#3b82f6';
+              }}
+            >
+              <FiExternalLink size={16} />
+              Get Directions
+            </button>
           </div>
         </div>
       )}
