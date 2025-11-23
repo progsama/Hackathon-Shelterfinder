@@ -251,7 +251,7 @@ interface Business {
   position: [number, number];
 }
 
-const KelownaMapPage: React.FC = () => {
+const MapPage: React.FC = () => {
   const navigate = useNavigate();
   const [mapMode, setMapMode] = useState<'map' | 'sos'>('map');
   const [sosTab, setSosTab] = useState<'emergency' | 'aid'>('emergency');
@@ -2289,5 +2289,5 @@ const KelownaMapPage: React.FC = () => {
   );
 };
 
-export default KelownaMapPage;
+export default MapPage;
 
