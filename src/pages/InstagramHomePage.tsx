@@ -84,50 +84,50 @@ const InstagramHomePage: React.FC = () => {
     },
     {
       id: 2,
-      username: 'Touch Grass',
-      userImage: 'https://picsum.photos/seed/user2/40/40',
-      image: 'https://picsum.photos/seed/post2/600/600',
-      likes: 8921,
+      username: 'eren_yeager',
+      userImage: 'https://static0.gamerantimages.com/wordpress/wp-content/uploads/2023/04/naruto-1-2.jpg?q=50&fit=crop&w=825&dpr=1.5',
+      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop',
+      likes: 12450,
       caption: 'Beautiful sunset from yesterday 🌅',
       timeAgo: '2h',
-      comments: 156,
+      comments: 234,
       isLiked: true,
       isSaved: false
     },
     {
       id: 3,
-      username: 'traveler',
-      userImage: 'https://picsum.photos/seed/user3/40/40',
+      username: 'tanjiro_kamado',
+      userImage: 'https://practicaltyping.com/wp-content/uploads/2022/04/leviacker.jpg',
       verified: true,
-      image: 'https://picsum.photos/seed/post3/600/600',
-      likes: 15432,
+      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=600&fit=crop',
+      likes: 18920,
       caption: 'Exploring new places ✈️ #travel #adventure',
       timeAgo: '4h',
-      comments: 432,
+      comments: 567,
       isLiked: false,
       isSaved: true
     },
     {
       id: 4,
-      username: 'foodie',
-      userImage: 'https://picsum.photos/seed/user4/40/40',
-      image: 'https://picsum.photos/seed/post4/600/600',
-      likes: 5678,
+      username: 'kakashi_hatake',
+      userImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqwlsYgyc8FVLURPVae1wnOT0Z1wWMMGqyYw&s',
+      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=600&fit=crop',
+      likes: 8765,
       caption: 'Delicious meal for dinner 🍽️',
       timeAgo: '6h',
-      comments: 89,
+      comments: 142,
       isLiked: true,
       isSaved: false
     },
     {
       id: 5,
-      username: 'fitness',
-      userImage: 'https://picsum.photos/seed/user5/40/40',
-      image: 'https://picsum.photos/seed/post5/600/600',
-      likes: 9876,
+      username: 'vegeta_prince',
+      userImage: 'https://preview.redd.it/pub7t1q255z41.jpg?auto=webp&s=f712b2ae7be1dd771c177ba0737b8d8a7c38e58e',
+      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=600&fit=crop',
+      likes: 11234,
       caption: 'Morning workout complete! 💪',
       timeAgo: '8h',
-      comments: 201,
+      comments: 298,
       isLiked: false,
       isSaved: false
     },
@@ -138,30 +138,30 @@ const InstagramHomePage: React.FC = () => {
       id: 1,
       username: 'eren_yeager',
       fullName: 'Eren Yeager',
-      image: 'https://picsum.photos/seed/eren/40/40',
+      image: 'https://static0.gamerantimages.com/wordpress/wp-content/uploads/2023/04/naruto-1-2.jpg?q=50&fit=crop&w=825&dpr=1.5',
       verified: true,
-      mutualFollowers: 'luffy_strawhat + 74 m'
+      mutualFollowers: 'luffy_strawhat + 74 more'
     },
     {
       id: 2,
-      username: 'tanjiro_demon',
+      username: 'tanjiro_kamado',
       fullName: 'Tanjiro Kamado',
-      image: 'https://picsum.photos/seed/tanjiro/40/40',
-      mutualFollowers: 'goku_saiyan'
+      image: 'https://practicaltyping.com/wp-content/uploads/2022/04/leviacker.jpg',
+      mutualFollowers: 'goku_saiyan + 12 more'
     },
     {
       id: 3,
-      username: 'kakashi_copy',
+      username: 'kakashi_hatake',
       fullName: 'Kakashi Hatake',
-      image: 'https://picsum.photos/seed/kakashi/40/40',
-      mutualFollowers: 'naruto_hokage + 27 m'
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqwlsYgyc8FVLURPVae1wnOT0Z1wWMMGqyYw&s',
+      mutualFollowers: 'naruto_hokage + 27 more'
     },
     {
       id: 4,
       username: 'vegeta_prince',
       fullName: 'Vegeta',
-      image: 'https://picsum.photos/seed/vegeta/40/40',
-      mutualFollowers: 'gojo_sensei +'
+      image: 'https://preview.redd.it/pub7t1q255z41.jpg?auto=webp&s=f712b2ae7be1dd771c177ba0737b8d8a7c38e58e',
+      mutualFollowers: 'gojo_sensei + 5 more'
     },
   ];
 
@@ -251,14 +251,21 @@ const InstagramHomePage: React.FC = () => {
           borderRadius: '50%',
           backgroundColor: '#262626',
           cursor: 'pointer',
-          backgroundImage: 'url(https://picsum.photos/seed/profile/24/24)',
+          backgroundImage: 'url(https://i.pinimg.com/564x/3a/3f/8a/3a3f8a5e5e5e5e5e5e5e5e5e5e5e5e5e5.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           border: '1px solid #262626',
-          transition: 'opacity 0.2s'
+          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
         }}
-        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.opacity = '0.8';
+          e.currentTarget.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.opacity = '1';
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
         />
         <MdOutlineMenu size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} 
           onClick={() => navigate('/settings')}
@@ -321,10 +328,17 @@ const InstagramHomePage: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s'
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.08)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
+                }}
                 >
                   <div style={{
                     width: '100%',
@@ -343,8 +357,11 @@ const InstagramHomePage: React.FC = () => {
                         width: '100%',
                         height: '100%',
                         borderRadius: '50%',
-                        objectFit: 'cover'
+                        objectFit: 'cover',
+                        transition: 'transform 0.3s ease'
                       }}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     />
                   </div>
                 </div>
@@ -406,19 +423,28 @@ const InstagramHomePage: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <BsThreeDots size={16} style={{ cursor: 'pointer' }} />
+                <BsThreeDots 
+                  size={16} 
+                  style={{ cursor: 'pointer', transition: 'opacity 0.2s ease' }} 
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.6'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                />
               </div>
 
               {/* Post Image */}
-              <div style={{ width: '100%', aspectRatio: '1', backgroundColor: '#262626' }}>
+              <div style={{ width: '100%', aspectRatio: '1', backgroundColor: '#262626', overflow: 'hidden' }}>
                 <img
                   src={post.image}
                   alt={post.caption}
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover'
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease',
+                    cursor: 'pointer'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 />
               </div>
 
@@ -432,19 +458,82 @@ const InstagramHomePage: React.FC = () => {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     {post.isLiked ? (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="#ed4956" style={{ cursor: 'pointer' }}>
+                      <svg 
+                        width="24" 
+                        height="24" 
+                        viewBox="0 0 24 24" 
+                        fill="#ed4956" 
+                        style={{ cursor: 'pointer', transition: 'transform 0.2s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                      >
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                       </svg>
                     ) : (
-                      <HiOutlineHeart size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} />
+                      <HiOutlineHeart 
+                        size={24} 
+                        style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} 
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.opacity = '0.6';
+                          e.currentTarget.style.transform = 'scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.opacity = '1';
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                      />
                     )}
-                    <FaRegComment size={22} style={{ cursor: 'pointer', transform: 'scaleX(-1)', transition: 'opacity 0.2s' }} />
-                    <FiSend size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} />
+                    <FaRegComment 
+                      size={22} 
+                      style={{ cursor: 'pointer', transform: 'scaleX(-1)', transition: 'all 0.2s ease' }} 
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = '0.6';
+                        e.currentTarget.style.transform = 'scaleX(-1) scale(1.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.transform = 'scaleX(-1) scale(1)';
+                      }}
+                    />
+                    <FiSend 
+                      size={24} 
+                      style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} 
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = '0.6';
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    />
                   </div>
                   {post.isSaved ? (
-                    <FaBookmark size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} />
+                    <FaBookmark 
+                      size={24} 
+                      style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} 
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = '0.6';
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    />
                   ) : (
-                    <FaRegBookmark size={24} style={{ cursor: 'pointer', transition: 'opacity 0.2s' }} />
+                    <FaRegBookmark 
+                      size={24} 
+                      style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} 
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = '0.6';
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    />
                   )}
                 </div>
 
@@ -500,14 +589,24 @@ const InstagramHomePage: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img
-              src="https://picsum.photos/seed/currentuser/56/56"
-              alt="arynnrosh"
+              src="https://i.pinimg.com/564x/3a/3f/8a/3a3f8a5e5e5e5e5e5e5e5e5e5e5e5e5e5.jpg"
+              alt="jordan_smith"
               style={{
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
                 objectFit: 'cover',
-                border: '1px solid #262626'
+                border: '1px solid #262626',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
             <div>
@@ -522,8 +621,11 @@ const InstagramHomePage: React.FC = () => {
               color: '#0095f6',
               fontSize: '12px',
               fontWeight: '600',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'opacity 0.2s ease'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
             Switch
           </button>
@@ -571,8 +673,12 @@ const InstagramHomePage: React.FC = () => {
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    objectFit: 'cover'
+                    objectFit: 'cover',
+                    transition: 'transform 0.2s ease',
+                    cursor: 'pointer'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 />
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -597,8 +703,11 @@ const InstagramHomePage: React.FC = () => {
                   color: '#0095f6',
                   fontSize: '12px',
                   fontWeight: '600',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  transition: 'opacity 0.2s ease'
                 }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
               >
                 Follow
               </button>

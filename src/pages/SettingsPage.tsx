@@ -128,7 +128,7 @@ const SettingsPage: React.FC = () => {
           borderRadius: '50%',
           backgroundColor: '#262626',
           cursor: 'pointer',
-          backgroundImage: 'url(https://picsum.photos/seed/profile/24/24)',
+          backgroundImage: 'url(https://i.pinimg.com/564x/3a/3f/8a/3a3f8a5e5e5e5e5e5e5e5e5e5e5e5e5e5.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           border: '1px solid #262626',
