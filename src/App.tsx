@@ -3,6 +3,7 @@ import InstagramHomePage from './pages/InstagramHomePage';
 import DMPage from './pages/DMPage';
 import SettingsPage from './pages/SettingsPage';
 import KelownaMapPage from './pages/KelownaMapPage';
+import ReservationPage from './pages/ReservationPage';
 import './App.css';
 
 const App: React.FC = () => {
@@ -14,6 +15,7 @@ const App: React.FC = () => {
         <Route path="/dm" element={<DMPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/kelowna-map" element={<KelownaMapPage />} />
+        <Route path="/reservation" element={<ReservationPage />} />
       </Routes>
     </Router>
   );
