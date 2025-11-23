@@ -55,15 +55,15 @@ const DMPage: React.FC = () => {
   ];
 
   const defaultMessages: Message[] = [
-    { id: 1, name: 'Steve', lastMessage: 'Hey, how are you doing?', time: '18m', unread: true },
-    { id: 2, name: 'John', lastMessage: 'Can we meet tomorrow?', time: '59m', unread: true },
-    { id: 3, name: 'Sarah', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
-    { id: 4, name: 'Mike', lastMessage: 'See you later', time: '3h', unread: false, isActive: true },
-    { id: 5, name: 'Emily', lastMessage: 'That sounds great', time: '5h', unread: false },
-    { id: 6, name: 'David', lastMessage: 'You: Sure, no problem', time: '17h', unread: false },
-    { id: 7, name: 'Lisa', lastMessage: 'Active 1m ago', time: '', unread: false, isActive: true, activeTime: '1m ago' },
-    { id: 8, name: 'Tom', lastMessage: 'You: Let me know when you\'re ready', time: '1d', unread: false },
-    { id: 9, name: 'Anna', lastMessage: 'Active now', time: '', unread: false, isActive: true, activeTime: 'now' },
+    { id: 1, name: 'God Usopp', lastMessage: 'I\'m not lying!', time: '18m', unread: true },
+    { id: 2, name: 'Itachi Uchiha', lastMessage: 'brb got some biz with the clan', time: '59m', unread: true },
+    { id: 3, name: 'Levi Ackerman', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
+    { id: 4, name: 'Eren Yeager', lastMessage: 'See you later', time: '3h', unread: false, isActive: true },
+    { id: 5, name: 'Light Yagami', lastMessage: 'That sounds great', time: '5h', unread: false },
+    { id: 6, name: 'Ichigo Kurosaki', lastMessage: 'You: Sure, no problem', time: '17h', unread: false },
+    { id: 7, name: 'Tanjiro Kamado', lastMessage: 'Active 1m ago', time: '', unread: false, isActive: true, activeTime: '1m ago' },
+    { id: 8, name: 'Kakashi Hatake', lastMessage: 'You: Let me know when you\'re ready', time: '1d', unread: false },
+    { id: 9, name: 'Vegeta', lastMessage: 'Active now', time: '', unread: false, isActive: true, activeTime: 'now' },
   ];
 
   useEffect(() => {

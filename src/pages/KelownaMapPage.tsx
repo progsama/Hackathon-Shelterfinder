@@ -267,7 +267,7 @@ const KelownaMapPage: React.FC = () => {
   const [showSOSConfirmation, setShowSOSConfirmation] = useState<boolean>(false);
   const kelownaPosition: [number, number] = [49.8880, -119.4960];
   
-  const closeFriends = ['Steve', 'John', 'Sarah', 'Mike', 'Emily'];
+  const closeFriends = ['Monkey D. Luffy', 'Son Goku', 'Naruto Uzumaki', 'Roronoa Zoro', 'Satoru Gojo'];
   
   
   const alertFireZone: [number, number][] = [

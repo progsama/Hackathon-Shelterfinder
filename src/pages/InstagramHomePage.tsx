@@ -58,14 +58,14 @@ const InstagramHomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const stories: Story[] = [
-    { id: 1, username: 'jennifer_m', image: 'https://picsum.photos/seed/story1/150/150' },
-    { id: 2, username: 'mike_travel', image: 'https://picsum.photos/seed/story2/150/150' },
-    { id: 3, username: 'sarah_photo', image: 'https://picsum.photos/seed/story3/150/150' },
-    { id: 4, username: 'alex_fitness', image: 'https://picsum.photos/seed/story4/150/150' },
-    { id: 5, username: 'emma_food', image: 'https://picsum.photos/seed/story5/150/150' },
-    { id: 6, username: 'david_art', image: 'https://picsum.photos/seed/story6/150/150' },
-    { id: 7, username: 'lisa_music', image: 'https://picsum.photos/seed/story7/150/150' },
-    { id: 8, username: 'tom_tech', image: 'https://picsum.photos/seed/story8/150/150' },
+    { id: 1, username: 'luffy_strawhat', image: 'https://picsum.photos/seed/luffy/150/150' },
+    { id: 2, username: 'goku_saiyan', image: 'https://picsum.photos/seed/goku/150/150' },
+    { id: 3, username: 'naruto_hokage', image: 'https://picsum.photos/seed/naruto/150/150' },
+    { id: 4, username: 'zoro_swordsman', image: 'https://picsum.photos/seed/zoro/150/150' },
+    { id: 5, username: 'gojo_sensei', image: 'https://picsum.photos/seed/gojo/150/150' },
+    { id: 6, username: 'usopp_sniper', image: 'https://picsum.photos/seed/usopp/150/150' },
+    { id: 7, username: 'itachi_akatsuki', image: 'https://picsum.photos/seed/itachi/150/150' },
+    { id: 8, username: 'levi_clean', image: 'https://picsum.photos/seed/levi/150/150' },
   ];
 
   const posts: Post[] = [
@@ -136,32 +136,32 @@ const InstagramHomePage: React.FC = () => {
   const suggestedUsers: SuggestedUser[] = [
     {
       id: 1,
-      username: 'creative_studio',
-      fullName: 'Creative Studio',
-      image: 'https://picsum.photos/seed/suggest1/40/40',
+      username: 'eren_yeager',
+      fullName: 'Eren Yeager',
+      image: 'https://picsum.photos/seed/eren/40/40',
       verified: true,
-      mutualFollowers: 'jennifer_m + 74 m'
+      mutualFollowers: 'luffy_strawhat + 74 m'
     },
     {
       id: 2,
-      username: 'nature_lover',
-      fullName: 'Nature Enthusiast',
-      image: 'https://picsum.photos/seed/suggest2/40/40',
-      mutualFollowers: 'mike_travel'
+      username: 'tanjiro_demon',
+      fullName: 'Tanjiro Kamado',
+      image: 'https://picsum.photos/seed/tanjiro/40/40',
+      mutualFollowers: 'goku_saiyan'
     },
     {
       id: 3,
-      username: 'fashion_blog',
-      fullName: 'Fashion Blog',
-      image: 'https://picsum.photos/seed/suggest3/40/40',
-      mutualFollowers: 'sarah_photo + 27 m'
+      username: 'kakashi_copy',
+      fullName: 'Kakashi Hatake',
+      image: 'https://picsum.photos/seed/kakashi/40/40',
+      mutualFollowers: 'naruto_hokage + 27 m'
     },
     {
       id: 4,
-      username: 'foodie_world',
-      fullName: 'Foodie World',
-      image: 'https://picsum.photos/seed/suggest4/40/40',
-      mutualFollowers: 'emma_food +'
+      username: 'vegeta_prince',
+      fullName: 'Vegeta',
+      image: 'https://picsum.photos/seed/vegeta/40/40',
+      mutualFollowers: 'gojo_sensei +'
     },
   ];
 
