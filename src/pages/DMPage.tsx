@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   FiHome, 
@@ -31,6 +31,10 @@ interface Message {
   hasAttachment?: boolean;
   isActive?: boolean;
   activeTime?: string;
+  isSOS?: boolean;
+  location?: [number, number];
+  locationText?: string;
+  sosSentAt?: number;
 }
 
 interface Note {
@@ -42,13 +46,14 @@ interface Note {
 const DMPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<'messages' | 'requests'>('messages');
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const notes: Note[] = [
     { id: 1, text: 'Your note' },
     { id: 2, text: 'Map', isMap: true },
   ];
 
-  const messages: Message[] = [
+  const defaultMessages: Message[] = [
     { id: 1, name: 'Steve', lastMessage: 'Hey, how are you doing?', time: '18m', unread: true },
     { id: 2, name: 'John', lastMessage: 'Can we meet tomorrow?', time: '59m', unread: true },
     { id: 3, name: 'Sarah', lastMessage: 'Thanks for your help!', time: '2h', unread: true },
@@ -59,6 +64,67 @@ const DMPage: React.FC = () => {
     { id: 8, name: 'Tom', lastMessage: 'You: Let me know when you\'re ready', time: '1d', unread: false },
     { id: 9, name: 'Anna', lastMessage: 'Active now', time: '', unread: false, isActive: true, activeTime: 'now' },
   ];
+
+  useEffect(() => {
+    const appStartTime = sessionStorage.getItem('appStartTime');
+    const currentTime = Date.now().toString();
+    
+    if (!appStartTime) {
+      sessionStorage.setItem('appStartTime', currentTime);
+      localStorage.setItem('sosSentAfterLoad', 'false');
+      localStorage.removeItem('lastSOSTimestamp');
+      const storedMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+      const nonSOSMessages = storedMessages.filter((m: Message) => !m.isSOS);
+      localStorage.setItem('dmMessages', JSON.stringify(nonSOSMessages));
+    }
+
+    const loadMessages = () => {
+      const storedMessages = JSON.parse(localStorage.getItem('dmMessages') || '[]');
+      const sosSentAfterLoad = localStorage.getItem('sosSentAfterLoad') === 'true';
+      const lastSOSTimestamp = parseInt(localStorage.getItem('lastSOSTimestamp') || '0');
+      
+      let sosMessages: Message[] = [];
+      if (sosSentAfterLoad && lastSOSTimestamp > 0) {
+        sosMessages = storedMessages.filter((m: Message) => 
+          m.isSOS && 
+          m.sosSentAt && 
+          m.sosSentAt === lastSOSTimestamp
+        );
+      }
+      
+      const nonSOSMessages = storedMessages.filter((m: Message) => !m.isSOS);
+      
+      const defaultMessagesFiltered = defaultMessages.filter(dm => 
+        !nonSOSMessages.some((sm: Message) => sm.name === dm.name) &&
+        !sosMessages.some((sm: Message) => sm.name === dm.name)
+      );
+      
+      const combinedMessages = [
+        ...sosMessages,
+        ...nonSOSMessages,
+        ...defaultMessagesFiltered
+      ];
+      
+      setMessages(combinedMessages);
+    };
+
+    loadMessages();
+
+    const handleSOSSent = () => {
+      loadMessages();
+    };
+
+    window.addEventListener('sosSent', handleSOSSent);
+    
+    const interval = setInterval(() => {
+      loadMessages();
+    }, 200);
+
+    return () => {
+      window.removeEventListener('sosSent', handleSOSSent);
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleNoteClick = (note: Note) => {
     if (note.isMap) {
@@ -305,11 +371,14 @@ const DMPage: React.FC = () => {
                   color: '#fff',
                   fontSize: '20px',
                   fontWeight: 'bold',
-                  background: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
+                  background: msg.isSOS 
+                    ? 'linear-gradient(135deg, #ff3040 0%, #ff6b6b 100%)'
+                    : `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`,
+                  border: msg.isSOS ? '2px solid #ff3040' : 'none'
                 }}>
-                  {msg.name.charAt(0)}
+                  {msg.isSOS ? '🚨' : msg.name.charAt(0)}
                 </div>
-                {msg.isActive && (
+                {msg.isActive && !msg.isSOS && (
                   <div style={{
                     position: 'absolute',
                     bottom: '0',
@@ -321,6 +390,25 @@ const DMPage: React.FC = () => {
                     border: '2px solid #000'
                   }} />
                 )}
+                {msg.isSOS && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '0',
+                    right: '0',
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ff3040',
+                    border: '2px solid #000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    fontWeight: 'bold'
+                  }}>
+                    !
+                  </div>
+                )}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
@@ -330,32 +418,56 @@ const DMPage: React.FC = () => {
                   marginBottom: '4px'
                 }}>
                   <span style={{
-                    color: '#fff',
-                    fontWeight: msg.unread ? '600' : '400',
-                    fontSize: '14px'
+                    color: msg.isSOS ? '#ff3040' : '#fff',
+                    fontWeight: msg.unread || msg.isSOS ? '600' : '400',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
                   }}>
+                    {msg.isSOS && <span>🚨</span>}
                     {msg.name}
                   </span>
                   {msg.time && (
-                    <span style={{ color: '#8e8e8e', fontSize: '12px' }}>{msg.time}</span>
+                    <span style={{ color: msg.isSOS ? '#ff3040' : '#8e8e8e', fontSize: '12px', fontWeight: msg.isSOS ? '600' : '400' }}>
+                      {msg.time}
+                    </span>
                   )}
                 </div>
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '4px'
+                  gap: '4px',
+                  backgroundColor: msg.isSOS ? 'rgba(255, 48, 64, 0.1)' : 'transparent',
+                  padding: msg.isSOS ? '4px 8px' : '0',
+                  borderRadius: msg.isSOS ? '6px' : '0',
+                  border: msg.isSOS ? '1px solid rgba(255, 48, 64, 0.3)' : 'none'
                 }}>
                   <p style={{
-                    color: '#8e8e8e',
+                    color: msg.isSOS ? '#ff3040' : (msg.unread ? '#fff' : '#8e8e8e'),
                     margin: 0,
                     fontSize: '14px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    flex: 1
+                    flex: 1,
+                    fontWeight: msg.isSOS ? '600' : '400'
                   }}>
                     {msg.lastMessage}
                   </p>
+                  {msg.isSOS && msg.locationText && (
+                    <div style={{
+                      color: '#ffb3b8',
+                      fontSize: '11px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      marginLeft: '4px'
+                    }}>
+                      <FiMapPin size={12} />
+                      {msg.locationText}
+                    </div>
+                  )}
                   {msg.unread && (
                     <div style={{
                       width: '8px',
