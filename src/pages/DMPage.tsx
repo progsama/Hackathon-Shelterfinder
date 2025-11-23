@@ -58,6 +58,7 @@ const DMPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'messages' | 'requests'>('messages');
   const [messages, setMessages] = useState<Message[]>([]);
   const [showForumPreview, setShowForumPreview] = useState<Message | null>(null);
+  const [hasSOSBeenSent, setHasSOSBeenSent] = useState<boolean>(false);
 
   const notes: Note[] = [
     { id: 1, text: 'Your note' },
@@ -113,8 +114,12 @@ const DMPage: React.FC = () => {
       const sosSentAfterLoad = localStorage.getItem('sosSentAfterLoad') === 'true';
       const lastSOSTimestamp = parseInt(localStorage.getItem('lastSOSTimestamp') || '0');
       
+      // Check if SOS has been sent
+      const sosSent = sosSentAfterLoad && lastSOSTimestamp > 0;
+      setHasSOSBeenSent(sosSent);
+      
       let sosMessages: Message[] = [];
-      if (sosSentAfterLoad && lastSOSTimestamp > 0) {
+      if (sosSent) {
         sosMessages = storedMessages.filter((m: Message) => 
           m.isSOS && 
           m.sosSentAt && 
@@ -345,7 +350,7 @@ const DMPage: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: note.id === 1 ? '4px solid #ed4956' : '2px solid #fff'
+                    border: (note.id === 1 && hasSOSBeenSent) ? '4px solid #ed4956' : '2px solid #fff'
                   }}>
                     <span style={{ fontSize: '20px' }}>📝</span>
                   </div>
