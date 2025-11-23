@@ -681,13 +681,58 @@ const KelownaMapPage: React.FC = () => {
             Kelowna Map
           </h1>
         </div>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', position: 'relative' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <Link 
+            to="/dm" 
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#262626',
+              color: '#fff',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <FiNavigation size={16} />
+            DM Page
+          </Link>
+          <Link 
+            to="/settings" 
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#262626',
+              color: '#fff',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontSize: '14px'
+            }}
+          >
+            Settings
+          </Link>
+        </div>
+      </div>
+
+      {/* Share Location Button - Top Middle of Map */}
+      <div style={{
+        position: 'absolute',
+        top: '90px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <div style={{ position: 'relative' }}>
           <button
             data-sharing-button
             onClick={() => setShowSharingOptions(!showSharingOptions)}
             style={{
               padding: '8px 16px',
-              backgroundColor: isSharingLocation ? '#22c55e' : '#262626',
+              backgroundColor: isSharingLocation ? '#22c55e' : 'rgba(0, 0, 0, 0.85)',
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
@@ -696,16 +741,18 @@ const KelownaMapPage: React.FC = () => {
               alignItems: 'center',
               gap: '8px',
               cursor: 'pointer',
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
             }}
             onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
               if (!isSharingLocation) {
-                e.currentTarget.style.backgroundColor = '#333';
+                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
               }
             }}
             onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
               if (!isSharingLocation) {
-                e.currentTarget.style.backgroundColor = '#262626';
+                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
               }
             }}
           >
@@ -719,7 +766,8 @@ const KelownaMapPage: React.FC = () => {
               style={{
                 position: 'absolute',
                 top: '100%',
-                right: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
                 marginTop: '8px',
                 backgroundColor: '#1a1a1a',
                 borderRadius: '12px',
@@ -940,37 +988,6 @@ const KelownaMapPage: React.FC = () => {
               </div>
             </div>
           )}
-          
-          <Link 
-            to="/dm" 
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#262626',
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <FiNavigation size={16} />
-            DM Page
-          </Link>
-          <Link 
-            to="/settings" 
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#262626',
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontSize: '14px'
-            }}
-          >
-            Settings
-          </Link>
         </div>
       </div>
 
